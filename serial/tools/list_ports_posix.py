@@ -139,12 +139,6 @@ elif plat[:3] == 'bsd' or  \
         devices = glob.glob('/dev/cuad*')
         return [(d, d, d) for d in devices]
 
-elif plat[:6] == 'darwin':   # OS X (confirmed)
-    def comports():
-        """scan for available ports. return a list of device names."""
-        devices = glob.glob('/dev/tty.*')
-        return [(d, d, d) for d in devices]
-
 elif plat[:6] == 'netbsd':   # NetBSD
     def comports():
         """scan for available ports. return a list of device names."""

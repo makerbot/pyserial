@@ -25,6 +25,8 @@ import os
 # chose an implementation, depending on os
 if os.name == 'nt': #sys.platform == 'win32':
     from serial.tools.list_ports_windows import *
+elif sys.platform == 'darwin':
+    from serial.tools.list_ports_osx import *
 elif os.name == 'posix':
     from serial.tools.list_ports_posix import *
 #~ elif os.name == 'java':
