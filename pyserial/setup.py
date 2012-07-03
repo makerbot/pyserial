@@ -11,6 +11,8 @@
 
 import sys
 
+from setuptools import setup
+
 from distutils.core import setup
 
 if sys.version_info >= (3, 0):
