@@ -174,7 +174,7 @@ def comports():
             info.append(get_string_property(usb_device, "USB Product Name"))
 
             info.append(
-                "USB VID:PID=%i:%i SNR=%s"%(
+                "USB VID:PID=%x:%x SNR=%s"%(
                 get_int_property(usb_device, "idVendor"),
                 get_int_property(usb_device, "idProduct"),
                 get_string_property(usb_device, "USB Serial Number"))

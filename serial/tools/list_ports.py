@@ -18,6 +18,10 @@ based on their descriptions or hardware ID.
 
 import sys, os, re
 
+#lib_path = os.path.abspath('/Users/mattmets/Projects/Makerbot/pyserial')
+#sys.path.insert(0,lib_path)
+
+
 # chose an implementation, depending on os
 #~ if sys.platform == 'cli':
 #~ else:
