@@ -1,4 +1,7 @@
 import ctypes
+import _winreg as winreg
+import itertools
+import sets
 import re
 
 def ValidHandle(value, func, arguments):
@@ -200,6 +203,122 @@ def comports():
 
     SetupDiDestroyDeviceInfoList(g_hdi)
 
+
+class VIDPIDAccessError(Exception):
+    def __init__(self):
+        pass
+
+class COMPORTAccessError(Exception):
+    def __init__(self):
+        pass
+
+def enumerate_recorded_ports_by_vid_pid(vid, pid):
+    """Given a port name, checks the dynamically
+    linked registries to find the VID/PID values
+    associated with this port.
+    """
+    path = get_path(vid, pid)
+    try:
+        #The key is the VID PID address for all possible Rep connections
+       key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
+    except WindowsError as e:
+       raise VIDPIDAccessError
+    #For each subkey of key
+    for i in itertools.count():
+       try:
+           #we grab the keys name
+           child_name = winreg.EnumKey(key, i) #EnumKey gets the NAME of a subkey
+           #Open a new key which is pointing at the node with the info we need
+           new_path = "%s\\%s\\Device Parameters", (path, child_name)
+           child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
+           #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
+           comport_info = []
+           #For each bit of information in this new key
+           for j in itertools.count():
+           try:
+               #Grab the values for a certain index
+               child_values = winreg.EnumValue(child_key, j)
+               #If the values are something we are interested in, save them
+               if child_values[0] == 'PortName' or child_values[0] == 'SymbolicName':
+                   comport_info.append(child_values)
+               #We've reached the end of the tree
+           except EnvironmentError:
+               yield comport_info
+               break
+        #We've reached the end of the tree
+       except EnvironmentError:
+           break
+  
+def get_path(pid, vid):
+    """
+    The registry path is dependent on the PID values
+    we are looking for.
+
+    @param str pid: The PID value in base 16
+    @param str vid: The VID value in base 16
+    @return str The path we are looking for
+    """
+    path = "SYSTEM\\CurrentControlSet\\Enum\\USB\\"
+    target = "VID_%s&PID_%s" %(pid, vid)
+    return path+target
+
+def enumerate_active_serial_ports():
+    """ Uses the Win32 registry to return an
+    iterator of serial (COM) ports
+    existing on this computer.
+    """
+    path = 'HARDWARE\\DEVICEMAP\\SERIALCOMM'
+    try:
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
+    except WindowsError:
+        raise COMPORTAccessError
+
+    for i in itertools.count():
+        try:
+            val = winreg.EnumValue(key, i)
+            yield str(val)
+        except EnvironmentError:
+            break
+
+def full_port_name(portname):
+    """ Given a port-name (of the form COM7,
+    COM12, CNCA0, etc.) returns a full
+    name suitable for opening with the
+    Serial class.
+    """
+    m = re.match('^COM(\d+)$', portname)
+    if m and int(m.group(1)) < 10:
+        return portname
+    return '\\\\.\\' + portname
+
+def parse_out_active_ports(ports):
+    """
+    Given an iterator of ports, parses out port names
+    """
+    for port in ports:
+        port_list = port.split(',')
+        port_name = port_list[1].strip().lstrip("u").lstrip("'").rstrip("'")
+        yield port_name
+
+def parse_out_recorded_ports(ports):
+    """Given an iterator of recorded ports, parses out port names
+    """
+    for port in ports:
+        yield str(port[0][1])
+
+def begin_scanning(self):
+    old_ports = sets.Set([])
+    while True:
+        current_ports = sets.Set(parse_out_active_ports(enumerate_active_serial_ports()))
+        recorded_ports = sets.Set(parse_out_recorded_ports(enumerate_recorded_ports_by_vid_pid()))
+        active_replicators = current_ports.intersection(recorded_ports)
+        if len(active_replicators) > len(old_ports):
+            for port in active_replicators-old_ports:
+            print "New Replicator Found At %s", (port)
+        elif len(active_replicators) < len(old_ports):
+            for port in old_ports-active_replicators:
+                print "Lost Connection with a Replicator at %s", (port)
+        old_ports = active_replicators
 
 # test
 if __name__ == '__main__':
