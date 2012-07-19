@@ -257,7 +257,7 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
        except EnvironmentError:
            break
   
-def get_path(pid, vid):
+def get_path(vid, pid):
     """
     The registry path is dependent on the PID values
     we are looking for.
@@ -267,7 +267,7 @@ def get_path(pid, vid):
     @return str The path we are looking for
     """
     path = "SYSTEM\\CurrentControlSet\\Enum\\USB\\"
-    target = "VID_%s&PID_%s" %(pid, vid)
+    target = "VID_%s&PID_%s" %(vid, pid)
     return path+target
 
 def enumerate_active_serial_ports():
@@ -293,20 +293,6 @@ def enumerate_active_serial_ports():
             yield val
         except EnvironmentError:
             break
-
-def full_port_name(portname):
-    """ Given a port-name (of the form COM7,
-    COM12, CNCA0, etc.) returns a full
-    name suitable for opening with the
-    Serial class.
-
-    @param str portname: The name of a port (i.e. COM4)
-    @return str: The actual address of that port
-    """
-    m = re.match('^COM(\d+)$', portname)
-    if m and int(m.group(1)) < 10:
-        return portname
-    return '\\\\.\\' + portname
 
 def parse_port_info_from_sym_name(sym_name):
     """
