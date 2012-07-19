@@ -342,9 +342,7 @@ def get_ports_by_vid_pid(vid, pid):
             #If the COM ports are the same
             if c_port[1] == r_port[0][1]:
                 #We put, in this order: COM#, ADDRESS, VIP, PID, iSerial
-                active_replicator = 
-                    [c_port[1], c_port[0]] + 
-                    parse_port_info_from_sym_name(r_port[1][1])
+                active_replicator = [c_port[1], c_port[0]] + parse_port_info_from_sym_name(r_port[1][1])
                 yield active_replicator
 
 if __name__ == '__main__':
