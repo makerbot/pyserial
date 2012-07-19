@@ -34,7 +34,6 @@ PHKEY = ctypes.POINTER(HKEY)
 ACCESS_MASK = DWORD
 REGSAM = ACCESS_MASK
 
-
 def byte_buffer(length):
     """Get a buffer for a string"""
     return (BYTE*length)()
@@ -205,10 +204,19 @@ def comports():
 
 
 class VIDPIDAccessError(Exception):
+    """a VIDPIDAccessError is indicative of the specific VID/PID
+    registry key missing.  This happens if a windows machine has never
+    seen a Replicator before.
+    """
     def __init__(self):
         pass
 
 class COMPORTAccessError(Exception):
+    """A COMPORTAccessError is indicative of the SERIALCOMM key
+    missing.  This actually happens every time (I think) windows
+    resets.  Its expected the layer on top of this one
+    will catch this error and report accordingly.
+    """
     def __init__(self):
         pass
 
@@ -266,6 +274,12 @@ def enumerate_active_serial_ports():
     """ Uses the Win32 registry to return an
     iterator of serial (COM) ports
     existing on this computer.
+
+    NB: When windows resets, it removes the SERIALCOMM key.
+    This means that if we try to scan before anything has been
+    plugged in, we will raise COMPORTAccessErrors.  Its expected
+    that the layer on top of this one will catch those errors
+    and report back accordingly.
     """
     path = 'HARDWARE\\DEVICEMAP\\SERIALCOMM'
     try:
@@ -285,29 +299,24 @@ def full_port_name(portname):
     COM12, CNCA0, etc.) returns a full
     name suitable for opening with the
     Serial class.
+
+    @param str portname: The name of a port (i.e. COM4)
+    @return str: The actual address of that port
     """
     m = re.match('^COM(\d+)$', portname)
     if m and int(m.group(1)) < 10:
         return portname
     return '\\\\.\\' + portname
 
-def parse_out_active_ports(ports):
-    """
-    Given an iterator of ports, parses out port names
-    """
-    for port in ports:
-        
-        port_list = port.split(',')
-        port_name = port_list[1].strip().lstrip("u").lstrip("'").rstrip("'")
-        yield port_name
-
-def parse_out_recorded_ports(ports):
-    """Given an iterator of recorded ports, parses out port names
-    """
-    for port in ports:
-        yield str(port[0][1])
-
 def parse_port_info_from_sym_name(sym_name):
+    """
+    Windows stores the VID, PID, iSerial (along with other bits of info)
+    in a single string separated by a # sign.  We parse that information out 
+    and export it.
+
+    @param str sym_name: The uber-string windows uses as an identifier
+    @return list: All the bits of information we need to id a port by its VIP/PID
+    """
     sym_list = sym_name.split('#')
     v_p = sym_list[1]
     v_p = v_p.replace('_', ':')
@@ -317,22 +326,28 @@ def parse_port_info_from_sym_name(sym_name):
     
 
 def get_ports_by_vid_pid(vid, pid):
+    """
+    Given VID and PID values, searched windows' registry keys for all COMPORTS
+    that have the same VID PID values, and returns the intersection of those ports
+    with the current ports that are being accessed.
+
+    @param str vid: The vendor id # for a usb device
+    @param str vid: The product id # for a usb device
+    @return iterator: Ports that are currently active with these VID/PID values
+    """
     recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
     current_ports = list(enumerate_active_serial_ports())
     for c_port in current_ports:
         for r_port in recorded_ports:
+            #If the COM ports are the same
             if c_port[1] == r_port[0][1]:
-                active_replicator = [c_port[1], c_port[0]] + parse_port_info_from_sym_name(r_port[1][1])
+                #We put, in this order: COM#, ADDRESS, VIP, PID, iSerial
+                active_replicator = 
+                    [c_port[1], c_port[0]] + 
+                    parse_port_info_from_sym_name(r_port[1][1])
                 yield active_replicator
 
-# test
 if __name__ == '__main__':
     ports = get_ports_by_vid_pid('23C1', 'D314')
     for port in ports:
-        s = serial.Serial(port[0], 115200, timeout=.2)
-        print s
-    #begin_scanning('23C1', 'D314')
-    #import serial
-
-    #for port, desc, hwid in sorted(comports()):
-    #    print "%s: %s [%s]" % (port, desc, hwid)
+        print port
