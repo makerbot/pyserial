@@ -235,17 +235,17 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
            comport_info = []
            #For each bit of information in this new key
            for j in itertools.count():
-           try:
-               #Grab the values for a certain index
-               child_values = winreg.EnumValue(child_key, j)
-               #If the values are something we are interested in, save them
-               if child_values[0] == 'PortName' or child_values[0] == 'SymbolicName':
-                   comport_info.append(child_values)
+               try:
+                   #Grab the values for a certain index
+                   child_values = winreg.EnumValue(child_key, j)
+                   #If the values are something we are interested in, save them
+                   if child_values[0] == 'PortName' or child_values[0] == 'SymbolicName':
+                       comport_info.append(child_values)
                #We've reached the end of the tree
-           except EnvironmentError:
-               yield comport_info
-               break
-        #We've reached the end of the tree
+               except EnvironmentError:
+                  yield comport_info
+                  break
+       #We've reached the end of the tree
        except EnvironmentError:
            break
   
@@ -314,7 +314,7 @@ def begin_scanning(self):
         active_replicators = current_ports.intersection(recorded_ports)
         if len(active_replicators) > len(old_ports):
             for port in active_replicators-old_ports:
-            print "New Replicator Found At %s", (port)
+                print "New Replicator Found At %s", (port)
         elif len(active_replicators) < len(old_ports):
             for port in old_ports-active_replicators:
                 print "Lost Connection with a Replicator at %s", (port)
