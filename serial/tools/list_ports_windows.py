@@ -317,12 +317,20 @@ def parse_port_info_from_sym_name(sym_name):
     @param str sym_name: The uber-string windows uses as an identifier
     @return list: All the bits of information we need to id a port by its VIP/PID
     """
+    return_dict = {}
     sym_list = sym_name.split('#')
+    return_dict['iSerial'] = sym_list[2]
     v_p = sym_list[1]
-    v_p = v_p.replace('_', ':')
+    v_p = v_p.replace('_', '')
     v_p = v_p.split('&')
-    iSerial = sym_list[2]
-    return v_p + [iSerial]
+    v_p.sort() #Windows labels their VID/PIDs, so we sort so we know which is which
+    pid = v_p[0]
+    pid = pid.replace('PID', '')
+    vid = v_p[1]
+    vid = vid.replace('VID', '')
+    return_dict['PID'] = pid
+    return_dict['VID'] = vid
+    return return_dict
     
 
 def get_ports_by_vid_pid(vid, pid):
@@ -335,6 +343,8 @@ def get_ports_by_vid_pid(vid, pid):
     @param str vid: The product id # for a usb device
     @return iterator: Ports that are currently active with these VID/PID values
     """
+    vid = vid.upper()
+    pid = pid.upper()
     recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
     current_ports = list(enumerate_active_serial_ports())
     for c_port in current_ports:
@@ -342,7 +352,7 @@ def get_ports_by_vid_pid(vid, pid):
             #If the COM ports are the same
             if c_port[1] == r_port[0][1]:
                 #We put, in this order: COM#, ADDRESS, VIP, PID, iSerial
-                active_replicator = [c_port[1], c_port[0]] + parse_port_info_from_sym_name(r_port[1][1])
+                active_replicator = dict({"PORT":c_port[1], "ADDRESS":c_port[0]}.items() + parse_port_info_from_sym_name(r_port[1][1]).items())
                 yield active_replicator
 
 if __name__ == '__main__':
