@@ -229,7 +229,7 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
            #we grab the keys name
            child_name = winreg.EnumKey(key, i) #EnumKey gets the NAME of a subkey
            #Open a new key which is pointing at the node with the info we need
-           new_path = "%s\\%s\\Device Parameters", (path, child_name)
+           new_path = "%s\\%s\\Device Parameters" %(path, child_name)
            child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
            #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
            comport_info = []
@@ -306,11 +306,11 @@ def parse_out_recorded_ports(ports):
     for port in ports:
         yield str(port[0][1])
 
-def begin_scanning():
+def begin_scanning(vid, pid):
     old_ports = sets.Set([])
     while True:
         current_ports = sets.Set(parse_out_active_ports(enumerate_active_serial_ports()))
-        recorded_ports = sets.Set(parse_out_recorded_ports(enumerate_recorded_ports_by_vid_pid()))
+        recorded_ports = sets.Set(parse_out_recorded_ports(enumerate_recorded_ports_by_vid_pid(vid, pid)))
         active_replicators = current_ports.intersection(recorded_ports)
         if len(active_replicators) > len(old_ports):
             for port in active_replicators-old_ports:
@@ -322,7 +322,8 @@ def begin_scanning():
 
 # test
 if __name__ == '__main__':
-    import serial
+    begin_scanning('23C1', 'D314')
+    #import serial
 
-    for port, desc, hwid in sorted(comports()):
-        print "%s: %s [%s]" % (port, desc, hwid)
+    #for port, desc, hwid in sorted(comports()):
+    #    print "%s: %s [%s]" % (port, desc, hwid)
