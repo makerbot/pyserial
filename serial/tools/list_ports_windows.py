@@ -276,7 +276,7 @@ def enumerate_active_serial_ports():
     for i in itertools.count():
         try:
             val = winreg.EnumValue(key, i)
-            yield str(val)
+            yield val
         except EnvironmentError:
             break
 
@@ -296,6 +296,7 @@ def parse_out_active_ports(ports):
     Given an iterator of ports, parses out port names
     """
     for port in ports:
+        
         port_list = port.split(',')
         port_name = port_list[1].strip().lstrip("u").lstrip("'").rstrip("'")
         yield port_name
@@ -306,23 +307,31 @@ def parse_out_recorded_ports(ports):
     for port in ports:
         yield str(port[0][1])
 
-def begin_scanning(vid, pid):
-    old_ports = sets.Set([])
-    while True:
-        current_ports = sets.Set(parse_out_active_ports(enumerate_active_serial_ports()))
-        recorded_ports = sets.Set(parse_out_recorded_ports(enumerate_recorded_ports_by_vid_pid(vid, pid)))
-        active_replicators = current_ports.intersection(recorded_ports)
-        if len(active_replicators) > len(old_ports):
-            for port in active_replicators-old_ports:
-                print "New Replicator Found At %s", (port)
-        elif len(active_replicators) < len(old_ports):
-            for port in old_ports-active_replicators:
-                print "Lost Connection with a Replicator at %s", (port)
-        old_ports = active_replicators
+def parse_port_info_from_sym_name(sym_name):
+    sym_list = sym_name.split('#')
+    v_p = sym_list[1]
+    v_p = v_p.replace('_', ':')
+    v_p = v_p.split('&')
+    iSerial = sym_list[2]
+    return v_p + [iSerial]
+    
+
+def get_ports_by_vid_pid(vid, pid):
+    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
+    current_ports = list(enumerate_active_serial_ports())
+    for c_port in current_ports:
+        for r_port in recorded_ports:
+            if c_port[1] == r_port[0][1]:
+                active_replicator = [c_port[1], c_port[0]] + parse_port_info_from_sym_name(r_port[1][1])
+                yield active_replicator
 
 # test
 if __name__ == '__main__':
-    begin_scanning('23C1', 'D314')
+    ports = get_ports_by_vid_pid('23C1', 'D314')
+    for port in ports:
+        s = serial.Serial(port[0], 115200, timeout=.2)
+        print s
+    #begin_scanning('23C1', 'D314')
     #import serial
 
     #for port, desc, hwid in sorted(comports()):
