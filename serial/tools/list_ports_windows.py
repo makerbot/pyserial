@@ -306,7 +306,7 @@ def parse_out_recorded_ports(ports):
     for port in ports:
         yield str(port[0][1])
 
-def begin_scanning(self):
+def begin_scanning():
     old_ports = sets.Set([])
     while True:
         current_ports = sets.Set(parse_out_active_ports(enumerate_active_serial_ports()))
