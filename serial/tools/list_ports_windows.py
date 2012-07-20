@@ -314,8 +314,8 @@ def parse_port_info_from_sym_name(sym_name):
     pid = pid.replace('PID', '')
     vid = v_p[1]
     vid = vid.replace('VID', '')
-    return_dict['PID'] = pid
-    return_dict['VID'] = vid
+    return_dict['PID'] = int(pid, 16)
+    return_dict['VID'] = int(vid, 16)
     return return_dict
     
 
@@ -329,8 +329,6 @@ def get_ports_by_vid_pid(vid, pid):
     @param str vid: The product id # for a usb device
     @return iterator: Ports that are currently active with these VID/PID values
     """
-    vid = vid.upper()
-    pid = pid.upper()
     recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
     current_ports = list(enumerate_active_serial_ports())
     for c_port in current_ports:
@@ -342,6 +340,6 @@ def get_ports_by_vid_pid(vid, pid):
                 yield active_replicator
 
 if __name__ == '__main__':
-    ports = get_ports_by_vid_pid('23C1', 'D314')
+    ports = get_ports_by_vid_pid(int('23C1', 16), int('D314', 16))
     for port in ports:
         print port
