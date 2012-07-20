@@ -224,6 +224,10 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
     """Given a port name, checks the dynamically
     linked registries to find the VID/PID values
     associated with this port.
+
+    @param int vid: The Vendor ID
+    @param int pid: The Product ID
+    @return iterator: An iterator of information for each port with these VID/PID values
     """
     #Convert pid/hex to upper case hex numbers
     vid = hex(vid).replace('0x', '').upper()
@@ -284,14 +288,18 @@ def enumerate_active_serial_ports():
     """
     path = 'HARDWARE\\DEVICEMAP\\SERIALCOMM'
     try:
+        #Opening the KEY to a certain path
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
     except WindowsError:
         raise COMPORTAccessError
 
+    #For each value attached to the above key
     for i in itertools.count():
         try:
+            #Get the next value and yield it
             val = winreg.EnumValue(key, i)
             yield val
+        #We are done traversing this tree
         except EnvironmentError:
             break
 
@@ -336,7 +344,9 @@ def get_ports_by_vid_pid(vid, pid):
         for r_port in recorded_ports:
             #If the COM ports are the same
             if c_port[1] == r_port['PortName']:
-                #We put, in this order: COM#, ADDRESS, VIP, PID, iSerial
+                #Return a dict of a bunch of values
+                #Windows adds an address, which sees important (though it might be totally useless)
+                #TODO: Find out if addresses do anything
                 active_replicator = dict({"PORT":c_port[1], "ADDRESS":c_port[0]}.items() + parse_port_info_from_sym_name(r_port['SymbolicName']).items())
                 yield active_replicator
 
