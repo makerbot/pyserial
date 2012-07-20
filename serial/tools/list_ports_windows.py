@@ -243,15 +243,13 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
            new_path = "%s\\%s\\Device Parameters" %(path, child_name)
            child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
            #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
-           comport_info = []
+           comport_info = {}
            #For each bit of information in this new key
            for j in itertools.count():
                try:
                    #Grab the values for a certain index
                    child_values = winreg.EnumValue(child_key, j)
-                   #If the values are something we are interested in, save them
-                   if child_values[0] == 'PortName' or child_values[0] == 'SymbolicName':
-                       comport_info.append(child_values)
+                   comport_info[child_values[0]] = child_values[1]
                #We've reached the end of the tree
                except EnvironmentError:
                   yield comport_info
@@ -337,9 +335,9 @@ def get_ports_by_vid_pid(vid, pid):
     for c_port in current_ports:
         for r_port in recorded_ports:
             #If the COM ports are the same
-            if c_port[1] == r_port[0][1]:
+            if c_port[1] == r_port['PortName']:
                 #We put, in this order: COM#, ADDRESS, VIP, PID, iSerial
-                active_replicator = dict({"PORT":c_port[1], "ADDRESS":c_port[0]}.items() + parse_port_info_from_sym_name(r_port[1][1]).items())
+                active_replicator = dict({"PORT":c_port[1], "ADDRESS":c_port[0]}.items() + parse_port_info_from_sym_name(r_port['SymbolicName']).items())
                 yield active_replicator
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ class TestListPortsWindows(unittest.TestCase):
     def test_get_path(self):
         vid = '0000'
         pid = '1111'
-        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%sPID_%s' %(vid, pid)
+        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%s&PID_%s' %(vid, pid)
         got_path = serial.tools.list_ports_windows.get_path(vid, pid)
         self.assertEqual(expected_path, got_path)
 
