@@ -1,13 +1,13 @@
 import unittest
-import serial.tools.list_ports_osx
+import serial.tools.get_ports_vid_pid_osx_posix
 
 class TestListPortsOsx(unittest.TestCase):
 
     def test_blank_string(self):
-        self.assertEquals(serial.tools.list_ports_osx.get_info_from_serial_identifier(''), {})
+        self.assertEquals(serial.tools.get_ports_vid_pid_osx_posix.get_info_from_serial_identifier(''), {})
 
     def test_not_usb_device(self):
-        self.assertEquals(serial.tools.list_ports_osx.get_info_from_serial_identifier('abcdefg'), {})
+        self.assertEquals(serial.tools.get_ports_vid_pid_osx_posix.get_info_from_serial_identifier('abcdefg'), {})
 
     def test_good_params_upper_case(self):
         identifier_string = 'USB VID:PID=12AB:34CD SNR=56Ef'
@@ -18,13 +18,13 @@ class TestListPortsOsx(unittest.TestCase):
           }
 
         self.assertEquals(
-            serial.tools.list_ports_osx.get_info_from_serial_identifier(identifier_string),
+            serial.tools.get_ports_vid_pid_osx_posix.get_info_from_serial_identifier(identifier_string),
             expected_info
           )
 
     def test_check_if_port_is_replicator_empty_data(self):
         data = {}
-        val = serial.tools.list_ports_osx.check_if_port_is_replicator(4779, 13517, data)
+        val = serial.tools.get_ports_vid_pid_osx_posix.check_if_port_is_replicator(4779, 13517, data)
         self.assertFalse(val)
 
     def test_check_if_port_is_replicator_mismatched_vid(self):
@@ -35,7 +35,7 @@ class TestListPortsOsx(unittest.TestCase):
             'PID'   :   pid,
             'iSerial'   :   '56ef'
             }
-        val = serial.tools.list_ports_osx.check_if_port_is_replicator(vid, pid, data)
+        val = serial.tools.get_ports_vid_pid_osx_posix.check_if_port_is_replicator(vid, pid, data)
         self.assertFalse(val)
 
     def test_check_if_port_is_replicator_mismatched_pid(self):
@@ -46,7 +46,7 @@ class TestListPortsOsx(unittest.TestCase):
             'PID'   :   pid+1,
             'iSerial'   :   '56ef',
             }
-        val = serial.tools.list_ports_osx.check_if_port_is_replicator(vid, pid, data)
+        val = serial.tools.get_ports_vid_pid_osx_posix.check_if_port_is_replicator(vid, pid, data)
         self.assertFalse(val)
 
     def test_check_if_port_is_replicator_good_values(self):
@@ -57,7 +57,7 @@ class TestListPortsOsx(unittest.TestCase):
             'PID'   :   pid,
             'iSerial'   :   '56ef',
             }
-        val = serial.tools.list_ports_osx.check_if_port_is_replicator(vid, pid, data)
+        val = serial.tools.get_ports_vid_pid_osx_posix.check_if_port_is_replicator(vid, pid, data)
         self.assertTrue(val)
 
 

@@ -37,7 +37,6 @@ elif os.name == 'posix':
 else:
     raise ImportError("Sorry: no implementation for your platform ('%s') available" % (os.name,))
 
-
 def grep(regexp):
     """\
     Search for ports using a regular expression. Port name, description and
