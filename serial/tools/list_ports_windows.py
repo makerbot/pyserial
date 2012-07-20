@@ -225,6 +225,9 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
     linked registries to find the VID/PID values
     associated with this port.
     """
+    #Convert pid/hex to upper case hex numbers
+    vid = hex(vid).replace('0x', '').upper()
+    pid = hex(pid).replace('0x', '').upper()
     path = get_path(vid, pid)
     try:
         #The key is the VID PID address for all possible Rep connections
