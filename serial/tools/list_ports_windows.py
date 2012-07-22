@@ -349,6 +349,6 @@ def list_ports_by_vid_pid(vid, pid):
 	
 
 if __name__ == '__main__':
-    ports = list_ports_by_vid_pid('0x23C1','0xD314'))
+    ports = list_ports_by_vid_pid('0x23C1','0xD314')
     for port in ports:
         print port

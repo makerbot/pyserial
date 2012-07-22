@@ -5,7 +5,7 @@ class TestListPortsWindows(unittest.TestCase):
 
     def test_parse_port_info_from_sym_name(self):
         sym_name = "horrible_stuff#PID_0000&VID_1111#12345678901234567890"
-	portBlob = {'a':1,'b':2}
+        portBlob = {'a':1,'b':2}
         expected_sym = {
                 "iSerial"   :   '12345678901234567890'
                 ,"PID"       :   '0000'
