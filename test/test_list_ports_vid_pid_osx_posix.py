@@ -6,19 +6,19 @@ import sys
 #so the ../serial folder is imported as 'import serial' rather than the system serial
 
 sys.path.insert(0,'.') 
-import serial.tools.get_ports_vid_pid_osx_posix as gp_vidpid
+import serial.tools.list_ports_vid_pid_osx_posix as lp_vidpid
 
 class TestListPortsOsx(unittest.TestCase):
 
     def test_blank_string(self):
         dummyport = ('','')
         self.assertEquals(
-		gp_vidpid.portdict_from_port(dummyport)
+		lp_vidpid.portdict_from_port(dummyport)
 		,{'Port':dummyport} )
 
     def test_not_usb_device(self):
 	dummyport=('','abcdefg')
-        self.assertEquals(gp_vidpid.portdict_from_port(dummyport)
+        self.assertEquals(lp_vidpid.portdict_from_port(dummyport)
 			  ,{'Port':dummyport})
 
     def test_good_params_upper_case(self):
@@ -31,7 +31,7 @@ class TestListPortsOsx(unittest.TestCase):
           }
 
         self.assertEquals(
-            gp_vidpid.portdict_from_port(dummyport),
+            lp_vidpid.portdict_from_port(dummyport),
             expected_info
           )
 

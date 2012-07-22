@@ -10,7 +10,7 @@ def portdict_from_port(port):
     Given a port object from serial.comport() create a vid/pid/iSerial/port dict if possible
 
     @param str identifier_string: String retrieved from a serial port
-    @return dict: A dictionary of the data we parsed out. On parse error the dict only contains the 'port' value
+    @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
     identifier_string = port[-1]
     data = {'Port':port}
@@ -24,7 +24,7 @@ def portdict_from_port(port):
     return data   
 
 
-def get_ports_by_vid_pid(vid, pid):
+def list_ports_by_vid_pid(vid, pid):
     """ Given a VID and PID value, scans for available port, and
 	if matches are found, returns a dict of 'VID/PID/iSerial/Port'
 	that have those values.

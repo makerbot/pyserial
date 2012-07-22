@@ -2,7 +2,7 @@ import glob
 import sys
 import os
 import re
-from get_ports_vid_pid_osx_posix import *
+from list_ports_vid_pid_osx_posix import *
 
 try:
     import subprocess

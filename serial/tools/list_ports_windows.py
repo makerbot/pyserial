@@ -303,32 +303,30 @@ def enumerate_active_serial_ports():
         except EnvironmentError:
             break
 
-def parse_port_info_from_sym_name(sym_name):
+def portdict_from_sym_name(sym_name,port):
     """
     Windows stores the VID, PID, iSerial (along with other bits of info)
     in a single string separated by a # sign.  We parse that information out 
     and export it.
 
-    @param str sym_name: The uber-string windows uses as an identifier
-    @return list: All the bits of information we need to id a port by its VIP/PID
+    @param str sym_name: windows usb id string. Z.b. "horrible_stuff#PID_0000&VID_1111#12345678901234567890"
+    @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
-    return_dict = {}
-    sym_list = sym_name.split('#')
-    return_dict['iSerial'] = sym_list[2]
-    v_p = sym_list[1]
-    v_p = v_p.replace('_', '')
-    v_p = v_p.split('&')
-    v_p.sort() #Windows labels their VID/PIDs, so we sort so we know which is which
-    pid = v_p[0]
-    pid = pid.replace('PID', '')
-    vid = v_p[1]
-    vid = vid.replace('VID', '')
-    return_dict['PID'] = int(pid, 16)
-    return_dict['VID'] = int(vid, 16)
-    return return_dict
+    dict = {'Port':port}
+    try: 
+        sym_list = sym_name.split('#')
+        v_p = sym_list[1]
+        v_p = v_p.split('&')
+        v_p.sort() #Windows labels their VID/PIDs, so we sort so we know which is which
+	dict['PID'] = v_p[0].replace('PID_','')
+	dict['VID'] = v_p[1].replace('VID_','') 
+	dict['iSerial'] = sym_list[2]
+    except IndexError: 
+	pass    
+    return dict 
     
 
-def get_ports_by_vid_pid(vid, pid):
+def list_ports_by_vid_pid(vid, pid):
     """
     Given VID and PID values, searched windows' registry keys for all COMPORTS
     that have the same VID PID values, and returns the intersection of those ports
@@ -338,19 +336,19 @@ def get_ports_by_vid_pid(vid, pid):
     @param str vid: The product id # for a usb device
     @return iterator: Ports that are currently active with these VID/PID values
     """
-    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
+    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(int(vid,16), int(pid,16)))
     current_ports = list(enumerate_active_serial_ports())
     for c_port in current_ports:
         for r_port in recorded_ports:
-            #If the COM ports are the same
+            #If the COM ports in cur and recoreded ports are the same, we want it
             if c_port[1] == r_port['PortName']:
-                #Return a dict of a bunch of values
-                #Windows adds an address, which sees important (though it might be totally useless)
+		match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
+                match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
                 #TODO: Find out if addresses do anything
-                active_replicator = dict({"PORT":c_port[1], "ADDRESS":c_port[0]}.items() + parse_port_info_from_sym_name(r_port['SymbolicName']).items())
-                yield active_replicator
+		yield match_dict 
+	
 
 if __name__ == '__main__':
-    ports = get_ports_by_vid_pid(int('23C1', 16), int('D314', 16))
+    ports = list_ports_by_vid_pid('0x23C1','0xD314'))
     for port in ports:
         print port
