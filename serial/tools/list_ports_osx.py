@@ -10,7 +10,6 @@
 import ctypes
 from ctypes import util
 import re
-from list_ports_vid_pid_osx_posix import *
 
 iokit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('IOKit'))
 cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
