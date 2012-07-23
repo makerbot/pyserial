@@ -325,7 +325,7 @@ def portdict_from_sym_name(sym_name,port):
     in a single string separated by a # sign.  We parse that information out 
     and export it.
 
-    @param str sym_name: windows usb id string. Z.b. "horrible_stuff#PID_0000&VID_1111#12345678901234567890"
+    @param str sym_name: windows usb id string. Z.b. "horrible_stuff#VID_0000&PID_1111#12345678901234567890"
     @param str port: The port we are considering
     @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
