@@ -18,7 +18,7 @@ class TestListPortsWindows(unittest.TestCase):
     def test_get_path(self):
         vid = 0
         pid = 1
-        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%s&PID_%s' %(lp_win.convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
+        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%s&PID_%s' %(lp_win.convert_to_16_bit_hex(vid), lp_win.convert_to_16_bit_hex(pid))
         got_path = lp_win.get_path(vid, pid)
         self.assertEqual(expected_path, got_path)
 
@@ -26,7 +26,7 @@ class TestConvertTo16BitHex(unittest.TestCase):
 
     def test_convert_to_16_bit_hex_bad_values(self):
         cases =[
-            -1,   #Negative numbers = Bad
+            -1,   #Too Small!!
             65536,#Too Big!!
             ]
         for case in cases:
@@ -40,7 +40,7 @@ class TestConvertTo16BitHex(unittest.TestCase):
         ['F0F0', 61680],
         ]
         for case in cases:
-            self.assertEqual(case[1], lp_win.convert_to_16_bit_hex(case[0]))
+            self.assertEqual(case[0], lp_win.convert_to_16_bit_hex(case[1]))
 
 if __name__ == '__main__':
     unittest.main()

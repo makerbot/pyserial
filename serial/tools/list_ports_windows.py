@@ -220,7 +220,6 @@ class COMPORTAccessError(Exception):
     def __init__(self):
         pass
 
-
 def convert_to_16_bit_hex(i):
     """Given an int value >= 0 and <= 65535,
     converts it to a 16 bit hex number (i.e.
@@ -336,8 +335,17 @@ def portdict_from_sym_name(sym_name,port):
         v_p = sym_list[1]
         v_p = v_p.split('&')
         v_p.sort() #Windows labels their VID/PIDs, so we sort so we know which is which
-        dict['PID'] = v_p[0].replace('PID_','')
-        dict['VID'] = v_p[1].replace('VID_','') 
+
+        #Convert PID into an int
+        PID = v_p[0].replace('PID_', '')
+        PID = int(PID, 16)
+        dict['PID'] = PID
+
+        #Convert VID into an int
+        VID = v_p[1].replace('VID_', '')
+        VID = int(VID, 16)
+        dict['VID'] = VID
+
         dict['iSerial'] = sym_list[2]
     except IndexError: 
   	    pass    
@@ -363,10 +371,9 @@ def list_ports_by_vid_pid(vid, pid):
                 match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
                 match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
                 #TODO: Find out if addresses do anything
-		yield match_dict 
-	
+                yield match_dict 
 
 if __name__ == '__main__':
-    ports = list_ports_by_vid_pid('0x23C1','0xD314')
+    ports = list_ports_by_vid_pid(int('0x23C1', 16),int('0xD314', 16))
     for port in ports:
         print port
