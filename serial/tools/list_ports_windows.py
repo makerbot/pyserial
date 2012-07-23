@@ -220,6 +220,25 @@ class COMPORTAccessError(Exception):
     def __init__(self):
         pass
 
+
+def convert_to_16_bit_hex(i):
+    """Given an int value >= 0 and <= 65535,
+    converts it to a 16 bit hex number (i.e.
+    0xffff, 0x0001)
+
+    @param int i: The number to convert
+    @return str h: The hex number to return
+    """
+    the_min = 0
+    the_max = 65535
+    if i < the_min or i > the_max:
+        raise ValueError
+    h = hex(i).replace('0x', '')
+    h = h.upper()
+    while len(h) < 4:
+        h = '0' + h
+    return h
+
 def enumerate_recorded_ports_by_vid_pid(vid, pid):
     """Given a port name, checks the dynamically
     linked registries to find the VID/PID values
@@ -230,9 +249,7 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
     @return iterator: An iterator of information for each port with these VID/PID values
     """
     #Convert pid/hex to upper case hex numbers
-    vid = hex(vid).replace('0x', '').upper()
-    pid = hex(pid).replace('0x', '').upper()
-    path = get_path(vid, pid)
+    path = get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
     try:
         #The key is the VID PID address for all possible Rep connections
        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
@@ -310,6 +327,7 @@ def portdict_from_sym_name(sym_name,port):
     and export it.
 
     @param str sym_name: windows usb id string. Z.b. "horrible_stuff#PID_0000&VID_1111#12345678901234567890"
+    @param str port: The port we are considering
     @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
     dict = {'Port':port}
@@ -332,11 +350,11 @@ def list_ports_by_vid_pid(vid, pid):
     that have the same VID PID values, and returns the intersection of those ports
     with the current ports that are being accessed.
 
-    @param str vid: The vendor id # for a usb device
-    @param str vid: The product id # for a usb device
+    @param int vid: The vendor id # for a usb device
+    @param int vid: The product id # for a usb device
     @return iterator: Ports that are currently active with these VID/PID values
     """
-    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(int(vid,16), int(pid,16)))
+    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
     current_ports = list(enumerate_active_serial_ports())
     for c_port in current_ports:
         for r_port in recorded_ports:

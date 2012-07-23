@@ -16,12 +16,31 @@ class TestListPortsWindows(unittest.TestCase):
         self.assertEqual(portdict, expected_sym)
 
     def test_get_path(self):
-        vid = '0000'
-        pid = '1111'
-        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%s&PID_%s' %(vid, pid)
+        vid = 0
+        pid = 1
+        expected_path = 'SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_%s&PID_%s' %(lp_win.convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
         got_path = lp_win.get_path(vid, pid)
         self.assertEqual(expected_path, got_path)
 
+class TestConvertTo16BitHex(unittest.TestCase):
+
+    def test_convert_to_16_bit_hex_bad_values(self):
+        cases =[
+            -1,   #Negative numbers = Bad
+            65536,#Too Big!!
+            ]
+        for case in cases:
+            self.assertRaises(ValueError, lp_win.convert_to_16_bit_hex, case)
+
+    def test_convert_to_16_bit_hex(self):
+        cases = [
+        ['0000', 0],
+        ['0001', 1],
+        ['FFFF', 65535],
+        ['F0F0', 61680],
+        ]
+        for case in cases:
+            self.assertEqual(case[1], lp_win.convert_to_16_bit_hex(case[0]))
 
 if __name__ == '__main__':
     unittest.main()
