@@ -10,7 +10,7 @@ class TestListPortsWindows(unittest.TestCase):
                 "iSerial"   :   '12345678901234567890'
                 ,"PID"       :   '0000'
                 ,"VID"       :   '1111'
-		,'Port'	     :   portBlob
+                ,'Port'	     :   portBlob
                 }
         portdict = lp_win.portdict_from_sym_name(sym_name,portBlob)
         self.assertEqual(portdict, expected_sym)

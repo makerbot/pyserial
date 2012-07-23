@@ -16,7 +16,7 @@ class TestListPortsOsx(unittest.TestCase):
         ('/dev/cu.usbmodemfd121', 'The Replicator', 'USB VID:PID=23c1:d314 SNR=64935343133351107190'),
         ['/dev/cu.Bluetooth-PDA-Sync', '', ''],
         ['/dev/cu.Bluetooth-Modem', '', '']
-      ]
+        ]
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports) 
       self.assertEquals(len(list(gen)), len(input_ports))
  
@@ -36,13 +36,13 @@ class TestListPortsOsx(unittest.TestCase):
     def test_blank_string(self):
         dummyport = ('','')
         self.assertEquals(
-		lp_vidpid.portdict_from_port(dummyport)
-		,{'Port':dummyport} )
+		        lp_vidpid.portdict_from_port(dummyport)
+		        ,{'Port':dummyport} )
 
     def test_not_usb_device(self):
-	dummyport=('','abcdefg')
+        dummyport=('','abcdefg')
         self.assertEquals(lp_vidpid.portdict_from_port(dummyport)
-			  ,{'Port':dummyport})
+			      ,{'Port':dummyport})
 
     def test_good_params_upper_case(self):
         dummyport = ('', 'USB VID:PID=12AB:34CD SNR=56Ef')

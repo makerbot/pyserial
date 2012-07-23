@@ -318,11 +318,11 @@ def portdict_from_sym_name(sym_name,port):
         v_p = sym_list[1]
         v_p = v_p.split('&')
         v_p.sort() #Windows labels their VID/PIDs, so we sort so we know which is which
-	dict['PID'] = v_p[0].replace('PID_','')
-	dict['VID'] = v_p[1].replace('VID_','') 
-	dict['iSerial'] = sym_list[2]
+        dict['PID'] = v_p[0].replace('PID_','')
+        dict['VID'] = v_p[1].replace('VID_','') 
+        dict['iSerial'] = sym_list[2]
     except IndexError: 
-	pass    
+  	    pass    
     return dict 
     
 
@@ -342,7 +342,7 @@ def list_ports_by_vid_pid(vid, pid):
         for r_port in recorded_ports:
             #If the COM ports in cur and recoreded ports are the same, we want it
             if c_port[1] == r_port['PortName']:
-		match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
+                match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
                 match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
                 #TODO: Find out if addresses do anything
 		yield match_dict 
