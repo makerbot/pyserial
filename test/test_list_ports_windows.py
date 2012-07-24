@@ -6,15 +6,15 @@ class TestListPortsWindows(unittest.TestCase):
     def test_parse_port_info_from_sym_name(self):
         vid = '0000'
         pid = '1111'
-        sym_name = "horrible_stuff#VID_%s&PID_%s#12345678901234567890", %(pid, vid)
-        portBlob = 'com13'
+        sym_name = "horrible_stuff#VID_%s&PID_%s#12345678901234567890" %(vid, pid)
+        port = 'com13'
         expected_sym = {
-                "iSerial"   :   '12345678901234567890'
-                ,"PID"       :   int(pid, 16),
-                ,"VID"       :   int(vid, 16),
-                ,'Port'	     :   portBlob
+                "iSerial"   :   '12345678901234567890',
+                "PID"       :   int(pid, 16),
+                "VID"       :   int(vid, 16),
+                'PORT'	     :   port,
                 }
-        portdict = lp_win.portdict_from_sym_name(sym_name,portBlob)
+        portdict = lp_win.portdict_from_sym_name(sym_name,port)
         self.assertEqual(portdict, expected_sym)
 
     def test_get_path(self):

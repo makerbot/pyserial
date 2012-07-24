@@ -329,7 +329,7 @@ def portdict_from_sym_name(sym_name,port):
     @param str port: The port we are considering
     @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
-    dict = {'Port':port}
+    dict = {'PORT':port}
     try: 
         sym_list = sym_name.split('#')
         v_p = sym_list[1]
