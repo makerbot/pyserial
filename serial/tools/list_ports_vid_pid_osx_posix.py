@@ -55,5 +55,5 @@ def filter_ports_by_vid_pid(ports,vid=None,pid=None):
             if vid == None or data['VID'] == vid:
                 if  pid == None or  data['PID'] == pid:
             	    yield data
-	except:
-		pass
+        except:
+            pass
