@@ -13,7 +13,8 @@ def portdict_from_port(port):
     @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
     identifier_string = port[-1]
-    data = {'Port':port}
+    data = {'BLOB':port}
+    data['PORT'] = port[0]
     try:
         vid, pid, serial_number = re.search('VID:PID=([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}) SNR=(\w*)', identifier_string).groups()
         data['VID'] = int(vid,16)
