@@ -331,6 +331,7 @@ def portdict_from_sym_name(sym_name,port):
     """
     dict = {'PORT':port}
     try: 
+        sym_name = sym_name.upper()
         sym_list = sym_name.split('#')
         v_p = sym_list[1]
         v_p = v_p.split('&')
