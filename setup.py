@@ -42,7 +42,7 @@ if sys.version < '2.3':
 
 import re, os
 version = re.search(
-        "VERSION.*'(.+)'",
+        "__version__.*'(.+)'",
         open(os.path.join('serial', '__init__.py')).read()).group(1)
 
 

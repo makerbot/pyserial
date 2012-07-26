@@ -8,6 +8,8 @@
 
 VERSION = '2.7-mb'
 
+__version__ = VERSION #for new naming standard compatiblity
+
 import sys
 
 if sys.platform == 'cli':
