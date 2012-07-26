@@ -1,5 +1,6 @@
 import re
-#from serial.tools.list_ports import comports
+from serial.tools.list_ports import comports
+
 """ 
 Contains tools for taking a serial object from the standard serial module,
 and intellegently parse out and use PID/VID and iSerial values from it
@@ -41,7 +42,7 @@ def list_ports_by_vid_pid(vid=None, pid=None):
 
 def filter_ports_by_vid_pid(ports,vid=None,pid=None):
     """ Given a VID and PID value, scans for available port, and
-	if matches are found, returns a dict of 'VID/PID/iSerial/Port'
+	f matches are found, returns a dict of 'VID/PID/iSerial/Port'
 	that have those values.
 
     @param list ports: Ports object of valid ports
