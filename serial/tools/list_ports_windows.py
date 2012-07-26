@@ -370,7 +370,7 @@ def list_ports_by_vid_pid(vid, pid):
             #If the COM ports in cur and recoreded ports are the same, we want it
             if c_port[1] == r_port['PortName']:
                 match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
-                match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
+                match_dict['address']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
                 #TODO: Find out if addresses do anything
                 yield match_dict 
 
