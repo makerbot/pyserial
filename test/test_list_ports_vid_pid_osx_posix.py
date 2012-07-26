@@ -37,12 +37,12 @@ class TestListPortsOsx(unittest.TestCase):
         dummyport = ('a','b')
         self.assertEquals(
 		        lp_vidpid.portdict_from_port(dummyport)
-		        ,{'BLOB':dummyport, 'PORT':dummyport[0]} )
+		        ,{'blob':dummyport, 'port':dummyport[0]} )
 
     def test_not_usb_device(self):
         dummyport=('','abcdefg')
         self.assertEquals(lp_vidpid.portdict_from_port(dummyport)
-			      ,{'BLOB':dummyport, 'PORT':dummyport[0]})
+			      ,{'blob':dummyport, 'port':dummyport[0]})
 
     def test_good_params_upper_case(self):
         dummyport = ('', 'USB VID:PID=12AB:34CD SNR=56Ef')
@@ -50,8 +50,8 @@ class TestListPortsOsx(unittest.TestCase):
           'VID' : 0x12AB
           ,'PID' : 0x34CD
           ,'iSerial' : '56Ef'
-          ,'BLOB' : dummyport
-          ,'PORT' : dummyport[0]
+          ,'blob' : dummyport
+          ,'port' : dummyport[0]
           }
 
         self.assertEquals(
