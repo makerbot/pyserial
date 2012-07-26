@@ -1,5 +1,5 @@
 import re
-from serial.tools.list_ports import comports
+#from serial.tools.list_ports import comports
 """ 
 Contains tools for taking a serial object from the standard serial module,
 and intellegently parse out and use PID/VID and iSerial values from it
