@@ -6,9 +6,10 @@
 # (C) 2001-2010 Chris Liechti <cliechti@gmx.net>
 # this is distributed under a free software license, see license.txt
 
+#this variable is kept for backwards compatability
 VERSION = '2.7-mb'
 
-__version__ = VERSION #for new naming standard compatiblity
+__version__ = '2.7-mb' #for new naming standard compatiblity
 
 import sys
 

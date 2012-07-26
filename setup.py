@@ -40,8 +40,13 @@ if sys.version < '2.3':
 #~ import serial
 #~ version = serial.VERSION
 
-import re, os
-version = re.search(
+if sys.version >= '2.3' and sys.version < '3.0':
+  import serial
+  version = serial.__version__
+
+elif sys.version >= 3.0:
+  import re, os
+  version = re.search(
         "__version__.*'(.+)'",
         open(os.path.join('serial', '__init__.py')).read()).group(1)
 
