@@ -26,7 +26,7 @@ import sys
 import serial
 
 # on which port should the tests be performed:
-PORT = 0
+port = 0
 BAUDRATE = 115200
 #~ BAUDRATE=9600
 
@@ -43,7 +43,7 @@ class TestHighLoad(unittest.TestCase):
     #~ N = 1
 
     def setUp(self):
-        self.s = serial.serial_for_url(PORT, BAUDRATE, timeout=10)
+        self.s = serial.serial_for_url(port, BAUDRATE, timeout=10)
 
     def tearDown(self):
         self.s.close()
@@ -70,8 +70,8 @@ if __name__ == '__main__':
     import sys
     sys.stdout.write(__doc__)
     if len(sys.argv) > 1:
-        PORT = sys.argv[1]
-    sys.stdout.write("Testing port: %r\n" % PORT)
+        port = sys.argv[1]
+    sys.stdout.write("Testing port: %r\n" % port)
     sys.argv[1:] = ['-v']
     # When this module is executed from the command-line, it runs all its tests
     unittest.main()

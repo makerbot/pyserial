@@ -29,7 +29,7 @@ import sys
 import serial
 
 # on which port should the tests be performed:
-PORT = 0
+port = 0
 
 if sys.version_info >= (3, 0):
     def data(string):
@@ -50,7 +50,7 @@ class Test4_Nonblocking(unittest.TestCase):
     timeout = 0
 
     def setUp(self):
-        self.s = serial.serial_for_url(PORT, timeout=self.timeout)
+        self.s = serial.serial_for_url(port, timeout=self.timeout)
 
     def tearDown(self):
         self.s.close()
@@ -124,7 +124,7 @@ class Test1_Forever(unittest.TestCase):
     character is sent after some time to stop the test, this is done
     through the SendEvent class and the Loopback HW."""
     def setUp(self):
-        self.s = serial.serial_for_url(PORT, timeout=None)
+        self.s = serial.serial_for_url(port, timeout=None)
         self.event = SendEvent(self.s)
 
     def tearDown(self):
@@ -142,7 +142,7 @@ class Test1_Forever(unittest.TestCase):
 class Test2_Forever(unittest.TestCase):
     """Tests a port with no timeout"""
     def setUp(self):
-        self.s = serial.serial_for_url(PORT, timeout=None)
+        self.s = serial.serial_for_url(port, timeout=None)
 
     def tearDown(self):
         self.s.close()
@@ -167,7 +167,7 @@ class Test2_Forever(unittest.TestCase):
 class Test0_DataWires(unittest.TestCase):
     """Test modem control lines"""
     def setUp(self):
-        self.s = serial.serial_for_url(PORT)
+        self.s = serial.serial_for_url(port)
 
     def tearDown(self):
         self.s.close()
@@ -199,7 +199,7 @@ class Test_MoreTimeouts(unittest.TestCase):
     """Test with timeouts"""
     def setUp(self):
         # create an closed serial port
-        self.s = serial.serial_for_url(PORT, do_not_open=True)
+        self.s = serial.serial_for_url(port, do_not_open=True)
 
     def tearDown(self):
         self.s.close()
@@ -207,7 +207,7 @@ class Test_MoreTimeouts(unittest.TestCase):
     def test_WriteTimeout(self):
         """Test write() timeout."""
         # use xonxoff setting and the loop-back adapter to switch traffic on hold
-        self.s.port = PORT
+        self.s.port = port
         self.s.writeTimeout = 1
         self.s.xonxoff = 1
         self.s.open()
@@ -223,8 +223,8 @@ if __name__ == '__main__':
     import sys
     sys.stdout.write(__doc__)
     if len(sys.argv) > 1:
-        PORT = sys.argv[1]
-    sys.stdout.write("Testing port: %r\n" % PORT)
+        port = sys.argv[1]
+    sys.stdout.write("Testing port: %r\n" % port)
     sys.argv[1:] = ['-v']
     # When this module is executed from the command-line, it runs all its tests
     unittest.main()

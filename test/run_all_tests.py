@@ -18,9 +18,9 @@ sys.path.insert(0, '..')
 import serial
 print "Patching sys.path to test local version. Testing Version: %s" % (serial.VERSION,)
 
-PORT = 'loop://'
+port = 'loop://'
 if len(sys.argv) > 1:
-    PORT = sys.argv[1]
+    port = sys.argv[1]
 
 # find files and the tests in them
 mainsuite = unittest.TestSuite()
@@ -33,7 +33,7 @@ for modulename in [os.path.splitext(x)[0]
     except ImportError:
         print "skipping %s" % modulename
     else:
-        module.PORT = PORT
+        module.port = port
         testsuite = unittest.findTestCases(module)
         print "found %s tests in %r" % (testsuite.countTestCases(), modulename)
         mainsuite.addTest(testsuite)

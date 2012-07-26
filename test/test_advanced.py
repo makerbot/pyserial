@@ -26,27 +26,27 @@ import unittest
 import serial
 
 # on which port should the tests be performed:
-PORT = 0
+port = 0
 
 class Test_ChangeAttributes(unittest.TestCase):
     """Test with timeouts"""
 
     def setUp(self):
         # create a closed serial port
-        self.s = serial.serial_for_url(PORT, do_not_open=True)
+        self.s = serial.serial_for_url(port, do_not_open=True)
 
     def tearDown(self):
         self.s.close()
 
     def test_PortSetting(self):
-        self.s.port = PORT
+        self.s.port = port 
         # portstr has to be set
-        if isinstance(PORT, str):
-            self.failUnlessEqual(self.s.portstr.lower(), PORT.lower())
+        if isinstance(port, str):
+            self.failUnlessEqual(self.s.portstr.lower(), port.lower())
         else:
-            self.failUnlessEqual(self.s.portstr, serial.device(PORT))
+            self.failUnlessEqual(self.s.portstr, serial.device(port))
         # test internals
-        self.failUnlessEqual(self.s._port, PORT)
+        self.failUnlessEqual(self.s._port, port)
         # test on the fly change
         self.s.open()
         self.failUnless(self.s.isOpen())
@@ -68,14 +68,14 @@ class Test_ChangeAttributes(unittest.TestCase):
             self.failUnlessEqual(self.s.portstr, serial.device(1))
 
     def test_DoubleOpen(self):
-        self.s.port = PORT
+        self.s.port = port 
         self.s.open()
         # calling open for a second time is an error
         self.failUnlessRaises(serial.SerialException, self.s.open)
 
 
     def test_BaudrateSetting(self):
-        self.s.port = PORT
+        self.s.port = port 
         self.s.open()
         for baudrate in (300, 9600, 19200, 115200):
             self.s.baudrate = baudrate
@@ -91,7 +91,7 @@ class Test_ChangeAttributes(unittest.TestCase):
     # therefore the test can not choose a value that fails on any system.
     def disabled_test_BaudrateSetting2(self):
         # test illegal values, depending on machine/port some of these may be valid...
-        self.s.port = PORT
+        self.s.port = port
         self.s.open()
         for illegal_value in (500000, 576000, 921600, 92160):
             self.failUnlessRaises(ValueError, self.s.setBaudrate, illegal_value)
@@ -167,7 +167,7 @@ class Test_ChangeAttributes(unittest.TestCase):
         self.failUnlessRaises(serial.SerialException, self.s.open)
 
     def test_PortOpenClose(self):
-        self.s.port = PORT
+        self.s.port = port 
         for i in range(3):
             # open the port and check flag
             self.failUnless(not self.s.isOpen())
@@ -181,8 +181,8 @@ if __name__ == '__main__':
     import sys
     sys.stdout.write(__doc__)
     if len(sys.argv) > 1:
-        PORT = sys.argv[1]
-    sys.stdout.write("Testing port: %r\n" % PORT)
+        port = sys.argv[1]
+    sys.stdout.write("Testing port: %r\n" % port)
     sys.argv[1:] = ['-v']
     # When this module is executed from the command-line, it runs all its tests
     unittest.main()

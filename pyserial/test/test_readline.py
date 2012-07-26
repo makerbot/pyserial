@@ -31,7 +31,7 @@ import serial
 #~ print serial.VERSION
 
 # on which port should the tests be performed:
-PORT = 0
+port = 0
 
 if sys.version_info >= (3, 0):
     def data(string):
@@ -45,7 +45,7 @@ class Test_Readline(unittest.TestCase):
     """Test readline function"""
 
     def setUp(self):
-        self.s = serial.serial_for_url(PORT, timeout=1)
+        self.s = serial.serial_for_url(port, timeout=1)
 
     def tearDown(self):
         self.s.close()
@@ -100,8 +100,8 @@ if __name__ == '__main__':
     import sys
     sys.stdout.write(__doc__)
     if len(sys.argv) > 1:
-        PORT = sys.argv[1]
-    sys.stdout.write("Testing port: %r\n" % PORT)
+        port = sys.argv[1]
+    sys.stdout.write("Testing port: %r\n" % port)
     sys.argv[1:] = ['-v']
     # When this module is executed from the command-line, it runs all its tests
     unittest.main()
