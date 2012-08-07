@@ -256,7 +256,17 @@ TIOCM_DTR_str = struct.pack('I', TIOCM_DTR)
 TIOCSBRK  = hasattr(TERMIOS, 'TIOCSBRK') and TERMIOS.TIOCSBRK or 0x5427
 TIOCCBRK  = hasattr(TERMIOS, 'TIOCCBRK') and TERMIOS.TIOCCBRK or 0x5428
 
+g_lockbase = None
+def g_getLockbase():
+	global g_lockbase
+	if g_lockbase: return g_lockbase
 
+	if(sys.platform == 'linux2'):
+		g_lockbase ='/var/lock/LCK..' 
+	else:
+		import tempfile
+		g_lockbase = g_lockbase = mkdtemp(suffix='', prefix='tmp', dir=None)
+	return g_lockbase
 class PosixSerial(SerialBase):
     """Serial port class POSIX implementation. Serial port configuration is 
     done with termios and fcntl. Runs on Linux and many other Un*x like
@@ -280,7 +290,7 @@ class PosixSerial(SerialBase):
         
         #create lockfile for open
         base = self._port.split('/')[-1]
-        self.lockfilename = os.path.join('/var/lock/LCK..', str(base) )
+        self.lockfilename = g_getLockbase() + str(base) 
         try:
             fhLock = os.open(self.lockfilename, os.O_EXCL|os.O_CREAT)
             os.close(fhLock)
@@ -288,7 +298,6 @@ class PosixSerial(SerialBase):
         except Exception:
             self.welocked = False
             raise SerialException("could not open port %s: [Error 5] Lockfile %s exists" %( self._port, self.lockfilename) )
-
 
         try:
             self._reconfigurePort()

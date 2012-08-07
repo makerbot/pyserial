@@ -6,22 +6,25 @@
 import os
 import sys
 
+sys.path.insert(0,"./") #for testing only, make sure we load our serial first
+
 try :
     import unittest2 as unittestA
 except ImportError:
     import unittest
 
 import serial
-import 
+import mock
+
 class TestLocking(unittest.TestCase):
 	
     def test_lockHappens(self):
         port = raw_input("specify an actual com port >")
         x = serial.Serial(port)
-        
+      
         #check that HSF Lockfile exists
         base, file = os.path.split(port)
-        lockfilename = os.path.join('/var/lock/LCK..', str(base))
+        lockfilename = '/var/lock/LCK..' +  str(file)
         self.assertTrue(os.path.isfile(lockfilename), "Lock file expected" )
  
         #check a 2nd open attempt will assert
@@ -36,7 +39,7 @@ class TestLocking(unittest.TestCase):
         # check that 'open' works
         x.open()       
         self.assertTrue(x.isOpen(), "post reopen we need isOpen true")  
-        self.assertFalse(os.path.isfile(lockfilename), "post open Lock file Expected" )
+        self.assertTrue(os.path.isfile(lockfilename), "post open Lock file Expected" )
 
         #post reopen, check a 2nd open attempt will assert
         with self.assertRaises(serial.SerialException):
