@@ -13,6 +13,7 @@
 # references: http://www.easysw.com/~mike/serial/serial.html
 
 import sys, os, fcntl, termios, struct, select, errno, time
+import tempfile
 from serial.serialutil import *
 
 # Do check the Python version as some constants have moved.
@@ -261,10 +262,9 @@ def g_getLockbase():
 	global g_lockbase
 	if g_lockbase: return g_lockbase
 
-	if(sys.platform == 'linux2'):
+	if os.path.isdir('/var/lock/') and os.access('/var/lock/',os.R_OK):
 		g_lockbase ='/var/lock/LCK..' 
 	else:
-		import tempfile
 		g_lockbase = g_lockbase = mkdtemp(suffix='', prefix='tmp', dir=None)
 	return g_lockbase
 class PosixSerial(SerialBase):
