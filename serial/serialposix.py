@@ -278,9 +278,9 @@ class PosixSerial(SerialBase):
             raise SerialException("could not open port %s: %s" % (self._port, msg))
         #~ fcntl.fcntl(self.fd, FCNTL.F_SETFL, 0)  # set blocking
         
-        #open part2 
+        #create lockfile for open
         base = self._port.split('/')[-1]
-        self.lockfilename = '/var/lock/LCK..'+str(base)
+        self.lockfilename = os.path.join('/var/lock/LCK..', str(base) )
         try:
             fhLock = os.open(self.lockfilename, os.O_EXCL|os.O_CREAT)
             os.close(fhLock)
@@ -435,8 +435,9 @@ class PosixSerial(SerialBase):
                 os.close(self.fd)
                 self.fd = None
             self._isOpen = False
-            if self.welocked is not None and self.lockfilename is not None:
+            if self.welocked is not None and self.welocked is True and self.lockfilename is not None:
                 os.remove(self.lockfilename)
+		self.welocked = False
 
     def makeDeviceName(self, port):
         return device(port)
