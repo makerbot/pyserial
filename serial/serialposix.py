@@ -265,7 +265,7 @@ def g_getLockbase():
 	if os.path.isdir('/var/lock/') and os.access('/var/lock/',os.R_OK):
 		g_lockbase ='/var/lock/LCK..' 
 	else:
-		g_lockbase = g_lockbase = mkdtemp(suffix='', prefix='tmp', dir=None)
+		g_lockbase = g_lockbase = tempfile.mkdtemp(suffix='', prefix='tmp', dir=None)
 	return g_lockbase
 class PosixSerial(SerialBase):
     """Serial port class POSIX implementation. Serial port configuration is 

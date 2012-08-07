@@ -21,10 +21,10 @@ class TestLocking(unittest.TestCase):
     def test_lockHappens(self):
         port = raw_input("specify an actual com port >")
         x = serial.Serial(port)
-      
+        lock_dir = serial.serialposix.g_getLockbase()
         #check that HSF Lockfile exists
         base, file = os.path.split(port)
-        lockfilename = '/var/lock/LCK..' +  str(file)
+        lockfilename = lock_dir + str(file)
         self.assertTrue(os.path.isfile(lockfilename), "Lock file expected" )
  
         #check a 2nd open attempt will assert
