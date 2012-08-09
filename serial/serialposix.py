@@ -291,7 +291,7 @@ class PosixSerial(SerialBase):
         
         #create lockfile for open
         base = self._port.split('/')[-1]
-        self.lockfilename = g_getLockbase() + str(base) 
+        self.lockfilename = os.path.join(g_getLockbase(), str(base))
         try:
             fhLock = os.open(self.lockfilename, os.O_EXCL|os.O_CREAT)
             os.close(fhLock)
