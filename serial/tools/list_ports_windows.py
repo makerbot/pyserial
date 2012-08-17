@@ -3,6 +3,7 @@ import _winreg as winreg
 import itertools
 import sets
 import re
+import logging
 
 def ValidHandle(value, func, arguments):
     if value == 0:
@@ -252,7 +253,7 @@ def filter_usb_dev_keys(base, vid, pid):
     try:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
     except WindowsError as e:
-        logging.getLogger().exception("Error opening toplevel registry key")
+        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
         raise VIDPIDAccessError
 
     for devnum in itertools.count():
@@ -288,8 +289,8 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
             #The key is the VID PID address for all possible Rep connections
             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vidpidkey)
         except WindowsError as e:
-            logging.getLogger().exception("Error opening toplevel registry key")
-            raise VIDPIDAccessError
+            #Windows registry seems to sometimes enumerates keys that don't exist
+            continue
         #For each subkey of key
         for i in itertools.count():
            try:
