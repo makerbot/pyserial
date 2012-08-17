@@ -238,6 +238,33 @@ def convert_to_16_bit_hex(i):
         h = '0' + h
     return h
 
+def filter_usb_dev_keys(base, vid, pid):
+    vidpattern = ".*"
+    pidpattern = ".*"
+
+    if vid is not None:
+        vidpattern = convert_to_16_bit_hex(vid)
+    if pid is not None:
+        pidpattern = convert_to_16_bit_hex(pid)
+
+    pattern = re.compile("VID_%s&PID_%s" %(vidpattern, pidpattern))
+
+    try:
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
+    except WindowsError as e:
+        logging.getLogger().exception("Error opening toplevel registry key")
+        raise VIDPIDAccessError
+
+    for devnum in itertools.count():
+        try:
+            devname = winreg.EnumKey(key, devnum)
+        except EnvironmentError as e:
+            break
+                
+        if pattern.match(devname) is not None:
+            yield base + devname
+    
+
 def enumerate_recorded_ports_by_vid_pid(vid, pid):
     """Given a port name, checks the dynamically
     linked registries to find the VID/PID values
@@ -247,36 +274,45 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
     @param int pid: The Product ID
     @return iterator: An iterator of information for each port with these VID/PID values
     """
+    base = "SYSTEM\\CurrentControlSet\\Enum\\USB\\"
     #Convert pid/hex to upper case hex numbers
-    path = get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
-    try:
-        #The key is the VID PID address for all possible Rep connections
-       key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
-    except WindowsError as e:
-       raise VIDPIDAccessError
-    #For each subkey of key
-    for i in itertools.count():
-       try:
-           #we grab the keys name
-           child_name = winreg.EnumKey(key, i) #EnumKey gets the NAME of a subkey
-           #Open a new key which is pointing at the node with the info we need
-           new_path = "%s\\%s\\Device Parameters" %(path, child_name)
-           child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
-           #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
-           comport_info = {}
-           #For each bit of information in this new key
-           for j in itertools.count():
-               try:
-                   #Grab the values for a certain index
-                   child_values = winreg.EnumValue(child_key, j)
-                   comport_info[child_values[0]] = child_values[1]
-               #We've reached the end of the tree
-               except EnvironmentError:
-                  yield comport_info
-                  break
-       #We've reached the end of the tree
-       except EnvironmentError:
-           break
+    #path = get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
+
+    if vid is not None and pid is not None:
+        vidpidkeys = [get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))]
+    else:
+        vidpidkeys = filter_usb_dev_keys(base, vid, pid)
+
+    for vidpidkey in vidpidkeys:
+        try:
+            #The key is the VID PID address for all possible Rep connections
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vidpidkey)
+        except WindowsError as e:
+            logging.getLogger().exception("Error opening toplevel registry key")
+            raise VIDPIDAccessError
+        #For each subkey of key
+        for i in itertools.count():
+           try:
+               #we grab the keys name
+               child_name = winreg.EnumKey(key, i) #EnumKey gets the NAME of a subkey
+               #Open a new key which is pointing at the node with the info we need
+               new_path = "%s\\%s\\Device Parameters" %(vidpidkey, child_name)
+               child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
+               #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
+               comport_info = {}
+               #For each bit of information in this new key
+               for j in itertools.count():
+                   try:
+                       #Grab the values for a certain index
+                       child_values = winreg.EnumValue(child_key, j)
+                       comport_info[child_values[0]] = child_values[1]
+                   #We've reached the end of the tree
+                   except EnvironmentError:
+                      yield comport_info
+                      break
+           #We've reached the end of the tree
+           except EnvironmentError:
+               break
   
 def get_path(vid, pid):
     """
@@ -353,7 +389,7 @@ def portdict_from_sym_name(sym_name,port):
     return dict 
     
 
-def list_ports_by_vid_pid(vid, pid):
+def list_ports_by_vid_pid(vid=None, pid=None):
     """
     Given VID and PID values, searched windows' registry keys for all COMPORTS
     that have the same VID PID values, and returns the intersection of those ports
@@ -368,7 +404,7 @@ def list_ports_by_vid_pid(vid, pid):
     for c_port in current_ports:
         for r_port in recorded_ports:
             #If the COM ports in cur and recoreded ports are the same, we want it
-            if c_port[1] == r_port['PortName']:
+           if 'PortName' in r_port and c_port[1] == r_port['PortName']:
                 match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
                 match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
                 #TODO: Find out if addresses do anything
