@@ -1,4 +1,5 @@
 import re
+import uuid
 from serial.tools.list_ports import comports
 
 """ 
@@ -17,10 +18,19 @@ def portdict_from_port(port):
     data = {'blob':port}
     data['port'] = port[0]
     try:
-        vid, pid, serial_number = re.search('VID:PID=([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}) SNR=(\w*)', identifier_string).groups()
+        fields= ['0x87654321', '0xd34d', '0x4360', '0xba', '0x18', '0x00254ba7e5d0']
+	mgroup = re.search('VID:PID=([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}) SNR=([0-9A-Fa-f]{12})', identifier_string).groups()
+        vid, pid, serial_number= mgroup[0],mgroup[1],mgroup[2]
         data['VID'] = int(vid,16)
         data['PID'] = int(pid,16)
         data['iSerial'] = serial_number
+        if len(serial_number) >= 12:
+        	fields[5] = '0x' + serial_number[-12:]
+	if len(serial_number) >= 20:
+                fields[0] = '0x' + serial_number[:8]
+        dFields = [int(i,16) for i in fields]
+        data['uuid'] = uuid.UUID(fields=dFields)
+
     except AttributeError:
         pass
     return data   
@@ -54,8 +64,8 @@ def filter_ports_by_vid_pid(ports,vid=None,pid=None):
         #Parse some info out of the identifier string
         try: 
             data = portdict_from_port(port)
-            if vid == None or data['VID'] == vid:
-                if  pid == None or  data['PID'] == pid:
+            if vid == None or data.get('VID',None) == vid:
+                if  pid == None or data.get('PID',None) == pid:
             	    yield data
-        except:
+        except Exception as e:
             pass

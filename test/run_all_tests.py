@@ -13,7 +13,7 @@ import time
 
 # inject local copy to avoid testing the installed version instead of the
 # working copy
-sys.path.insert(0, '..')
+sys.path.insert(0, './')
 
 import serial
 print "Patching sys.path to test local version. Testing Version: %s" % (serial.VERSION,)

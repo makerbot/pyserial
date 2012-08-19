@@ -13,7 +13,7 @@ class TestListPortsOsx(unittest.TestCase):
 
     def test_filter_ports(self):
       input_ports = [
-        ('/dev/cu.usbmodemfd121', 'The Replicator', 'USB VID:PID=23c1:d314 SNR=64935343133351107190'),
+        ['/dev/cu.usbmodemfd121', 'The Replicator', 'USB VID:PID=23c1:d314 SNR=64935343133351107190'],
         ['/dev/cu.Bluetooth-PDA-Sync', '', ''],
         ['/dev/cu.Bluetooth-Modem', '', '']
         ]
@@ -45,19 +45,20 @@ class TestListPortsOsx(unittest.TestCase):
 			      ,{'blob':dummyport, 'port':dummyport[0]})
 
     def test_good_params_upper_case(self):
-        dummyport = ('', 'USB VID:PID=12AB:34CD SNR=56Ef')
+        dummyport = ('', 'USB VID:PID=12AB:34CD SNR=00254ba7e5d0')
         expected_info = {
           'VID' : 0x12AB
           ,'PID' : 0x34CD
-          ,'iSerial' : '56Ef'
+	  # vvv last 12 or first 8 + last 12 of uuid == iSerial vvv
+	  ,'uuid': UUID('87654321-d34d-4360-ba18-00254ba7e5d0')
+          ,'iSerial' : '00254ba7e5d0'
           ,'blob' : dummyport
           ,'port' : dummyport[0]
           }
-
-        self.assertEquals(
-            lp_vidpid.portdict_from_port(dummyport),
-            expected_info
-          )
+        import pdb
+	pdb.set_trace()
+	result = lp_vidpid.portdict_from_port(dummyport),
+        self.assertEquals( expected_info, result  )
 
 
 
