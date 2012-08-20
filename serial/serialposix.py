@@ -257,17 +257,57 @@ TIOCM_DTR_str = struct.pack('I', TIOCM_DTR)
 TIOCSBRK  = hasattr(TERMIOS, 'TIOCSBRK') and TERMIOS.TIOCSBRK or 0x5427
 TIOCCBRK  = hasattr(TERMIOS, 'TIOCCBRK') and TERMIOS.TIOCCBRK or 0x5428
 
-g_lockbase = None
-def g_getLockbase():
-	global g_lockbase
-	if g_lockbase: return g_lockbase
+# Serial locks are implemented through old-style lock files:
+# http://tldp.org/HOWTO/Serial-HOWTO-13.html
+#
+# On Ubuntu, /var/lock has been migrated to /run/lock. Worse yet,
+# the symlink /var/lock->/run/lock is missing on my system and
+# perhaps others due to migration bugs. We look for /var/lock, and
+# fall back on /run/lock if it's not there. If there's no /run/lock,
+# then we fall back on tempfile.gettempdir().
+def findLockDir():
+    def isOkay(path):
+        return os.path.isdir(path) and os.access(path,os.R_OK)
+    options = ['/var/lock','/run/lock']
+    for option in options:
+        if isOkay(option):
+            return option
+    return tempfile.gettempdir()
 
-	if os.path.isdir('/var/lock/') and os.access('/var/lock/',os.R_OK):
-		g_lockbase ='/var/lock/LCK..' 
-	else:
-		g_lockbase = tempfile.gettempdir()
-#		g_lockbase = g_lockbase = tempfile.mkdtemp(suffix='', prefix='tmp', dir=None)
-	return g_lockbase
+
+def getLockfilePath(devName):
+	return os.path.join(findLockDir(),'LCK..'+devName)
+
+def acquireLock(path, secondTry = False):
+    try:
+        fhLock = os.open(path, os.O_EXCL|os.O_CREAT|os.O_RDWR)
+        os.write(fhLock,str(os.getpid())+"\n")
+        os.close(fhLock)
+        return True
+    except OSError as oserr:
+        import errno
+        if oserr.errno == errno.EEXIST and not secondTry:
+            # Check for stale lockfile.            
+            lf = os.open(path, os.O_RDONLY)
+            try:
+                lockedPid = int(os.read(lf,100))
+            except ValueError:
+                # stale lock detection here should be based on lock age
+                raise SerialException("could not acquire lock for %s; locked by unknown process " %( path ))
+            os.close(lf)
+            try:
+                os.kill(lockedPid,0)
+            except OSError:
+                # Stale lock file!
+                print "Stale lock file found; attempting to remove."
+                os.unlink(path)
+                return acquireLock(path, True)
+            raise SerialException( "could not open port %s: locked by PID %d" %( path, lockedPid ) )
+        raise SerialException( "could not open port %s: errno %d (%s)" %( path, oserr.errno, os.strerror(oserr.errno) ) )         
+    except Exception:
+        raise
+    raise SerialException("could not open lockfile %s" %( path ))
+
 class PosixSerial(SerialBase):
     """Serial port class POSIX implementation. Serial port configuration is 
     done with termios and fcntl. Runs on Linux and many other Un*x like
@@ -289,16 +329,11 @@ class PosixSerial(SerialBase):
             raise SerialException("could not open port %s: %s" % (self._port, msg))
         #~ fcntl.fcntl(self.fd, FCNTL.F_SETFL, 0)  # set blocking
         
-        #create lockfile for open
+        #create lockfile for port
         base = self._port.split('/')[-1]
-        self.lockfilename = os.path.join(g_getLockbase(), "LCK....."+str(base))
-        try:
-            fhLock = os.open(self.lockfilename, os.O_EXCL|os.O_CREAT)
-            os.close(fhLock)
-            self.welocked = True
-        except Exception:
-            self.welocked = False
-            raise SerialException("could not open port %s: [Error 5] Lockfile %s exists" %( self._port, self.lockfilename) )
+        self.lockfilename = getLockfilePath(base)
+        self.welocked = False
+        self.welocked = acquireLock(self.lockfilename)
 
         try:
             self._reconfigurePort()
