@@ -298,7 +298,11 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
                child_name = winreg.EnumKey(key, i) #EnumKey gets the NAME of a subkey
                #Open a new key which is pointing at the node with the info we need
                new_path = "%s\\%s\\Device Parameters" %(vidpidkey, child_name)
-               child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
+               try:
+                   child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, new_path)
+               except WindowsError as e:
+                   continue #not all com ports are fully filled out
+
                #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
                comport_info = {}
                #For each bit of information in this new key
