@@ -1,7 +1,6 @@
 #
 # Top-level SConstruct file for pyserial
 #
-#
 
 AddOption('--test', action='store_true', dest='test')
 run_test = GetOption('test')
@@ -20,8 +19,13 @@ def CleanActionFunc(env, targets, action):
 
 env.AddMethod(CleanActionFunc, 'CleanAction')
 
+<<<<<<< HEAD
 env.Command('pyserial/build', 'setup.py',
             'python setup.py build')
+=======
+env.Command('pyserial/build', 'pyserial/setup.py',
+            'cd pyserial;python setup.py build')
+>>>>>>> a94a2de5d73dba96d6c99ece920d55be49cde513
 
 #we're not using pyparallel
 #env.Command('pyparallel/build', 'pyparallel/setup.py',
