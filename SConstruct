@@ -2,10 +2,12 @@
 # Top-level SConstruct file for pyserial
 #
 
+import os
+
 AddOption('--test', action='store_true', dest='test')
 run_test = GetOption('test')
 
-env = Environment()
+env = Environment(ENV = os.environ)
 
 def TestClean(env, targets):
     if not env.GetOption('clean'):
