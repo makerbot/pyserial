@@ -77,7 +77,7 @@ if   plat[:5] == 'linux':    # Linux (confirmed)
             # create descriptions. prefer text from device, fall back to the others
             return '%s %s %s' % (iManufacturer or idVendor, iProduct or idProduct, iSerial)
         except IOError:
-            return base
+            return sysfs_path
 
     def describe(device):
         """\
