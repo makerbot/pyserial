@@ -405,11 +405,11 @@ def list_ports_by_vid_pid(vid=None, pid=None):
     @return iterator: Ports that are currently active with these VID/PID values
     """
     recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
-	try:
-    	current_ports = list(enumerate_active_serial_ports())
-	except COMPORTAccessError: #catch exception that is raised if SERIALCOMM does not yet exist
-		print "COMPORTAccessError: Could not open COM ports for listing"
-		return
+    try:
+        current_ports = list(enumerate_active_serial_ports())
+    except COMPORTAccessError: #catch exception that is raised if SERIALCOMM does not yet exist
+        print 'COMPORTAccessError: Could not open COM ports for listing'
+        return
     for c_port in current_ports:
         for r_port in recorded_ports:
             #If the COM ports in cur and recoreded ports are the same, we want it
