@@ -7,6 +7,10 @@ import os
 AddOption('--test', action='store_true', dest='test')
 run_test = GetOption('test')
 
+#not used, added for consistency
+AddOption('--debug_build', action='store_true', dest='debug_build')
+debug = GetOption('debug_build')
+
 env = Environment(ENV = os.environ)
 
 def TestClean(env, targets):
