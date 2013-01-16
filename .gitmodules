@@ -1,0 +1,3 @@
+[submodule "submodule/mw-scons-tools"]
+	path = submodule/mw-scons-tools
+	url = https://github.com/makerbot/mw-scons-tools.git
