@@ -41,7 +41,7 @@ env.Command('pyserial/build', 'setup.py',
 
 pyserial_egg = env.Command('dist/pyserial-2.7_mb2.1-py2.7.egg',
                            serial_src,
-             "python -c 'import setuptools; execfile(\"setup.py\")' bdist_egg")
+               'python -c "import setuptools; execfile(\'setup.py\')" bdist_egg')
 
 env.MBInstallEgg(pyserial_egg)
 env.MBCreateInstallTarget()
