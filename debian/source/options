@@ -1,0 +1,5 @@
+extend-diff-ignore = ".*\.pyc$"
+extend-diff-ignore = ".sconsign.dblite"
+extend-diff-ignore = ".coverage"
+extend-diff-ignore = ".*\.git$"
+extend-diff-ignore = ".*\.git/.*"
