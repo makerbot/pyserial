@@ -1,7 +1,7 @@
 Source: mb-pyserial
 Priority: extra
 Maintainer: MakerBot Industries dev team <dev@makerbot.com>
-Build-Depends: debhelper (>= 8.0.0), python
+Build-Depends: debhelper (>= 8.0.0), python2.7
 Standards-Version: 3.9.2
 Section: libs
 Homepage: <insert the upstream URL, if relevant>
@@ -11,5 +11,5 @@ Homepage: <insert the upstream URL, if relevant>
 Package: mb-pyserial
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7
 Description: Modified pyserial for MakerBot Conveyor
