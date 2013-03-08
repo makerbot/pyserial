@@ -248,7 +248,7 @@ def filter_usb_dev_keys(base, vid, pid):
     if pid is not None:
         pidpattern = convert_to_16_bit_hex(pid)
 
-    pattern = re.compile("VID_%s&PID_%s" %(vidpattern, pidpattern))
+    pattern = re.compile("VID_%s&PID_%s" %(vidpattern, pidpattern), re.IGNORECASE)
 
     try:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
