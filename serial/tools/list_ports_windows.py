@@ -413,11 +413,16 @@ def list_ports_by_vid_pid(vid=None, pid=None):
     for c_port in current_ports:
         for r_port in recorded_ports:
             #If the COM ports in cur and recoreded ports are the same, we want it
-           if 'PortName' in r_port and c_port[1] == r_port['PortName']:
-                match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
-                match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
-                #TODO: Find out if addresses do anything
-                yield match_dict 
+           if 'PortName' in r_port and 'SymbolicName' in r_port and c_port[1] == r_port['PortName']:
+               try:
+                   match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
+                   match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
+                   #TODO: Find out if addresses do anything
+                   yield match_dict 
+               except Exception as E:
+                   logging.getLogger('list_ports_windows').error('Error scanning usb devices' + str(e))
+
+                   
 
 if __name__ == '__main__':
     ports = list_ports_by_vid_pid(int('0x23C1', 16),int('0xD314', 16))
