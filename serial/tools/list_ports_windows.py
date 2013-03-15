@@ -248,7 +248,7 @@ def filter_usb_dev_keys(base, vid, pid):
     if pid is not None:
         pidpattern = convert_to_16_bit_hex(pid)
 
-    pattern = re.compile("VID_%s&PID_%s" %(vidpattern, pidpattern), re.IGNORECASE)
+    pattern = re.compile("VID_(%s)&PID_(%s)" %(vidpattern, pidpattern), re.IGNORECASE)
 
     try:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
@@ -261,9 +261,12 @@ def filter_usb_dev_keys(base, vid, pid):
             devname = winreg.EnumKey(key, devnum)
         except EnvironmentError as e:
             break
-                
-        if pattern.match(devname) is not None:
-            yield base + devname
+
+        m = pattern.match(devname)
+        if m is not None:
+            yield {'key': base + devname,
+                   'VID': m.group(1),
+                   'PID': m.group(2)}
     
 
 def enumerate_recorded_ports_by_vid_pid(vid, pid):
@@ -280,11 +283,15 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
     #path = get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))
 
     if vid is not None and pid is not None:
-        vidpidkeys = [get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid))]
+        vidpidkeys = [{'key' : get_path(convert_to_16_bit_hex(vid), convert_to_16_bit_hex(pid)),
+                       'VID' : convert_to_16_bit_hex(vid),
+                       'PID' : convert_to_16_bit_hex(pid)}]
     else:
         vidpidkeys = filter_usb_dev_keys(base, vid, pid)
 
-    for vidpidkey in vidpidkeys:
+    for vidpidkey_details in vidpidkeys:
+        vidpidkey = vidpidkey_details['key']
+
         try:
             #The key is the VID PID address for all possible Rep connections
             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vidpidkey)
@@ -304,7 +311,10 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
                    continue #not all com ports are fully filled out
 
                #child_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path+'\\'+child_name+'\\Device Parameters')
-               comport_info = {}
+               comport_info = {'iSerial' : child_name,
+                               'VID' : vidpidkey_details['VID'],
+                               'PID' : vidpidkey_details['PID']}
+
                #For each bit of information in this new key
                for j in itertools.count():
                    try:
@@ -413,10 +423,14 @@ def list_ports_by_vid_pid(vid=None, pid=None):
     for c_port in current_ports:
         for r_port in recorded_ports:
             #If the COM ports in cur and recoreded ports are the same, we want it
-           if 'PortName' in r_port and 'SymbolicName' in r_port and c_port[1] == r_port['PortName']:
+           if 'PortName' in r_port and c_port[1] == r_port['PortName']:
                try:
-                   match_dict = portdict_from_sym_name(r_port['SymbolicName'],c_port[1])
-                   match_dict['ADDRESS']=c_port[0]  #Windows adds an address, which sees important (though it might be totally useless)
+                   match_dict = {'iSerial' : r_port['iSerial'],
+                                 'VID' : int(r_port['VID'], 16),
+                                 'PID' : int(r_port['PID'], 16),
+#Windows adds an address, which sees important (though it might be totally useless)
+                                 'ADDRESS' : c_port[0],
+                                 'port' : c_port[1]}
                    #TODO: Find out if addresses do anything
                    yield match_dict 
                except Exception as E:
