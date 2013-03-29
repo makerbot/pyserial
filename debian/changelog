@@ -1,3 +1,9 @@
+mb-pyserial (2.0.3) unstable; urgency=low
+
+  * Bugfixes for port detection
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Fri, 29 Mar 2013 18:01:00 -0400
+
 mb-pyserial (2.0.0) unstable; urgency=low
 
   * New build system, port detection fixes
