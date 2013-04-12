@@ -293,14 +293,10 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
 
     try:
         for index in itertools.count():
-            try:
-                ftdi_port = winreg.EnumKey(ftdibus, index)
-                vid, pid, not_iSerial = ftdi_port.split('+')
-                vid = vid[4:] # strip the initial 'VID_'
-                pid = pid[4:] # strip the initial 'PID_'
-            except WindowsError as e:
-                logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-                continue
+            ftdi_port = winreg.EnumKey(ftdibus, index)
+            vid, pid, not_iSerial = ftdi_port.split('+')
+            vid = vid[4:] # strip the initial 'VID_'
+            pid = pid[4:] # strip the initial 'PID_'
 
             try:
                 device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
