@@ -221,6 +221,12 @@ class COMPORTAccessError(Exception):
     def __init__(self):
         pass
 
+class FTDIError(Exception):
+    """An FTDIError is raised when ...
+    """
+    def __init__(self):
+        pass
+
 def convert_to_16_bit_hex(i):
     """Given an int value >= 0 and <= 65535,
     converts it to a 16 bit hex number (i.e.
@@ -267,7 +273,58 @@ def filter_usb_dev_keys(base, vid, pid):
             yield {'key': base + devname,
                    'VID': m.group(1),
                    'PID': m.group(2)}
-    
+
+
+def enumerate_ftdi_ports_by_vid_pid(vid, pid):
+    """Lists all the FTDI ports in the FTDIBUS
+    registry entry with a given VID/PID pair.
+
+    @param int vid: The Vendor ID
+    @param int pid: The Product ID
+    @return iterator: An iterator of information for each port with these VID/PID values
+    """
+    base = "SYSTEM\\CurrentControlSet\\Enum\\FTDIBUS\\"
+
+    try:
+        ftdibus = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
+    except WindowsError as e:
+        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+        raise FTDIError
+
+    try:
+        for index in itertools.count():
+            try:
+                ftdi_port = winreg.EnumKey(ftdibus, index)
+                vid, pid, not_iSerial = ftdi_port.split('+')
+                vid = vid[4:] # strip the initial 'VID_'
+                pid = pid[4:] # strip the initial 'PID_'
+            except WindowsError as e:
+                logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                continue
+
+            try:
+                device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                               base + ftdi_port + '\\0000\\Device Parameters')
+                for param in itertools.count():
+                    name, value, type = winreg.EnumValue(device_params, param)
+                    if 'PortName' == name:
+                        port_name = value
+                        break
+            except WindowsError as e:
+                logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                # didn't find a portname? not sure if this is a
+                # problem, or if this will even ever happen.
+                continue
+
+            yield {'VID': vid,
+                   'PID': pid,
+                   'iSerial': not_iSerial,
+                   'PortName': port_name}
+            index += 1
+    except WindowsError as e:
+        # the end of the FTDI list
+        raise StopIteration
+
 
 def enumerate_recorded_ports_by_vid_pid(vid, pid):
     """Given a port name, checks the dynamically
@@ -328,7 +385,7 @@ def enumerate_recorded_ports_by_vid_pid(vid, pid):
            #We've reached the end of the tree
            except EnvironmentError:
                break
-  
+
 def get_path(vid, pid):
     """
     The registry path is dependent on the PID values
@@ -373,7 +430,7 @@ def enumerate_active_serial_ports():
 def portdict_from_sym_name(sym_name,port):
     """
     Windows stores the VID, PID, iSerial (along with other bits of info)
-    in a single string separated by a # sign.  We parse that information out 
+    in a single string separated by a # sign.  We parse that information out
     and export it.
 
     @param str sym_name: windows usb id string. Z.b. "horrible_stuff#VID_0000&PID_1111#12345678901234567890"
@@ -381,7 +438,7 @@ def portdict_from_sym_name(sym_name,port):
     @return dict: A dictionary VID/PID/iSerial/Port.  On parse error dict contails only 'Port':port'
     """
     dict = {'port':port}
-    try: 
+    try:
         sym_name = sym_name.upper()
         sym_list = sym_name.split('#')
         v_p = sym_list[1]
@@ -399,10 +456,10 @@ def portdict_from_sym_name(sym_name,port):
         dict['VID'] = VID
 
         dict['iSerial'] = sym_list[2]
-    except IndexError: 
-  	    pass    
-    return dict 
-    
+    except IndexError:
+  	    pass
+    return dict
+
 
 def list_ports_by_vid_pid(vid=None, pid=None):
     """
@@ -414,7 +471,20 @@ def list_ports_by_vid_pid(vid=None, pid=None):
     @param int vid: The product id # for a usb device
     @return iterator: Ports that are currently active with these VID/PID values
     """
-    recorded_ports = list(enumerate_recorded_ports_by_vid_pid(vid, pid))
+    recorded_ports = []
+
+    try:
+      recorded_ports += list(enumerate_recorded_ports_by_vid_pid(vid, pid))
+    except Exception as e:
+      logging.getLogger('list_ports_windows').error('Error scanning usb devices' + str(e))
+      pass
+
+    try:
+      recorded_ports += list(enumerate_ftdi_ports_by_vid_pid(vid, pid))
+    except Exception as e:
+      logging.getLogger('list_ports_windows').error('Error scanning ftdi devices' + str(e))
+      pass
+
     try:
         current_ports = list(enumerate_active_serial_ports())
     except COMPORTAccessError: #catch exception that is raised if SERIALCOMM does not yet exist
@@ -432,11 +502,11 @@ def list_ports_by_vid_pid(vid=None, pid=None):
                                  'ADDRESS' : c_port[0],
                                  'port' : c_port[1]}
                    #TODO: Find out if addresses do anything
-                   yield match_dict 
+                   yield match_dict
                except Exception as E:
                    logging.getLogger('list_ports_windows').error('Error scanning usb devices' + str(e))
 
-                   
+
 
 if __name__ == '__main__':
     ports = list_ports_by_vid_pid(int('0x23C1', 16),int('0xD314', 16))
