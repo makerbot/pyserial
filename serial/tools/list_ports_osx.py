@@ -52,7 +52,7 @@ cf.CFNumberGetValue.restype = ctypes.c_void_p
 
 def get_string_property(device_t, property):
     """ Search the given device for the specified string property
-    
+
     @param device_t Device to search
     @param property String to search for.
     @return Python string containing the value, or None if not found.
@@ -79,7 +79,7 @@ def get_string_property(device_t, property):
 
 def get_int_property(device_t, property):
     """ Search the given device for the specified string property
-    
+
     @param device_t Device to search
     @param property String to search for.
     @return Python string containing the value, or None if not found.
@@ -158,6 +158,34 @@ def GetIOServicesByType(service_type):
 
     return services
 
+def ftdi_serial_ports():
+    # Scan for all iokit USB devices
+    services = GetIOServicesByType('IOUSBDevice')
+
+    ftdi_vid = 1027
+    ftdi_pid = 24577
+
+    ports = []
+    for service in services:
+        vid = get_int_property(service, 'idVendor')
+        pid = get_int_property(service, 'idProduct')
+
+        if ftdi_vid == vid and ftdi_pid == pid:
+            info = []
+
+            info.append(get_string_property(service, 'USB Product Name'))
+
+            info.append(
+                "USB VID:PID=%x:%x SNR=%s"%(
+                vid,
+                pid,
+                get_string_property(service, 'USB Serial Number'))
+            )
+
+            ports.append(info)
+
+    return ports
+
 def comports():
     # Scan for all iokit serial ports
     services = GetIOServicesByType('IOSerialBSDClient')
@@ -186,6 +214,7 @@ def comports():
 
         ports.append(info)
 
+    ports += ftdi_serial_ports()
     return ports
 
 # test
