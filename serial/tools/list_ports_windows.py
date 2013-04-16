@@ -288,7 +288,7 @@ def enumerate_recorded_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
     try:
         ftdibus = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
     except WindowsError as e:
-        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+        logging.getLogger('list_ports_windows').debug('WindowsError: ' + e.strerror)
         raise FTDIError
 
     try:
@@ -311,7 +311,7 @@ def enumerate_recorded_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
                             port_name = value
                             break
                 except WindowsError as e:
-                    logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                    logging.getLogger('list_ports_windows').debug('WindowsError: ' + e.strerror)
                     # didn't find a portname? not sure if this is a
                     # problem, or if this will even ever happen.
                     continue
