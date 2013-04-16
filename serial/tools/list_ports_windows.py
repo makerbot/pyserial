@@ -275,12 +275,12 @@ def filter_usb_dev_keys(base, vid, pid):
                    'PID': m.group(2)}
 
 
-def enumerate_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
+def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     """Lists all the FTDI ports in the FTDIBUS
     registry entry with a given VID/PID pair.
 
-    @param int vid_filter: The Vendor ID -- this is sort of silly, because ftdi should always be 0x0403
-    @param int pid_filter: The Product ID
+    @param int vid: The Vendor ID
+    @param int pid: The Product ID
     @return iterator: An iterator of information for each port with these VID/PID values
     """
     base = "SYSTEM\\CurrentControlSet\\Enum\\FTDIBUS\\"
@@ -297,9 +297,6 @@ def enumerate_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
             vid, pid, not_iSerial = ftdi_port.split('+')
             vid = vid[4:] # strip the initial 'VID_'
             pid = pid[4:] # strip the initial 'PID_'
-
-            if vid != vid_filter or pid != pid_filter:
-                continue
 
             try:
                 device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
