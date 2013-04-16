@@ -275,7 +275,7 @@ def filter_usb_dev_keys(base, vid, pid):
                    'PID': m.group(2)}
 
 
-def enumerate_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
+def enumerate_recorded_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
     """Lists all the FTDI ports in the FTDIBUS
     registry entry with a given VID/PID pair.
 
@@ -298,7 +298,9 @@ def enumerate_ftdi_ports_by_vid_pid(vid_filter, pid_filter):
             vid = vid[4:] # strip the initial 'VID_'
             pid = pid[4:] # strip the initial 'PID_'
 
-            if vid != vid_filter or pid != pid_filter:
+            vid_not_ok = None != vid_filter and vid != vid_filter
+            pid_not_ok = None != pid_filter and pid != pid_filter
+            if vid_not_ok or pid_not_ok:
                 continue
 
             try:
@@ -479,7 +481,7 @@ def list_ports_by_vid_pid(vid=None, pid=None):
       pass
 
     try:
-      recorded_ports += list(enumerate_ftdi_ports_by_vid_pid(vid, pid))
+      recorded_ports += list(enumerate_recorded_ftdi_ports_by_vid_pid(vid, pid))
     except Exception as e:
       logging.getLogger('list_ports_windows').error('Error scanning ftdi devices' + str(e))
       pass
