@@ -221,12 +221,6 @@ class COMPORTAccessError(Exception):
     def __init__(self):
         pass
 
-class FTDIError(Exception):
-    """An FTDIError is raised when ...
-    """
-    def __init__(self):
-        pass
-
 def convert_to_16_bit_hex(i):
     """Given an int value >= 0 and <= 65535,
     converts it to a 16 bit hex number (i.e.
@@ -289,7 +283,8 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
         ftdibus = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
     except WindowsError as e:
         logging.getLogger('list_ports_windows').debug('WindowsError: ' + e.strerror)
-        raise FTDIError
+        # There has never been an FTDI plugged in
+        raise StopIteration
 
     try:
         for index in itertools.count():
