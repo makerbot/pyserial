@@ -494,8 +494,8 @@ def list_ports_by_vid_pid(vid=None, pid=None):
                                  'port' : c_port[1]}
                    #TODO: Find out if addresses do anything
                    yield match_dict
-               except Exception as E:
-                   logging.getLogger('list_ports_windows').error('Error scanning usb devices' + str(e))
+               except Exception as e:
+                   logging.getLogger('list_ports_windows').error('Error scanning usb devices %s' % str(e))
 
 
 
