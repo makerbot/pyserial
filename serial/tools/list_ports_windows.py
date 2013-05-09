@@ -274,7 +274,7 @@ def filter_usb_dev_keys(base, vid, pid):
                    'VID': m.group(1),
                    'PID': m.group(2)}
 
-
+ftdi_vid_pid_regex = re.compile('VID_(\d+)[^+]*\+PID_(\d+)[^+]*\+(.*)')
 def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     """Lists all the FTDI ports in the FTDIBUS
     registry entry with a given VID/PID pair.
@@ -294,28 +294,35 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     try:
         for index in itertools.count():
             ftdi_port = winreg.EnumKey(ftdibus, index)
-            vid, pid, not_iSerial = ftdi_port.split('+')
-            vid = vid[4:] # strip the initial 'VID_'
-            pid = pid[4:] # strip the initial 'PID_'
 
-            try:
-                device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                                               base + ftdi_port + '\\0000\\Device Parameters')
-                for param in itertools.count():
-                    name, value, type = winreg.EnumValue(device_params, param)
-                    if 'PortName' == name:
-                        port_name = value
-                        break
-            except WindowsError as e:
-                logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-                # didn't find a portname? not sure if this is a
-                # problem, or if this will even ever happen.
-                continue
+            ftdi_data = ftdi_vid_pid_regex.match(ftdi_port)
+            if None != ftdi_data:
 
-            yield {'VID': vid,
-                   'PID': pid,
-                   'iSerial': not_iSerial,
-                   'PortName': port_name}
+                vid = ftdi_data.group(1)
+                pid = ftdi_data.group(2)
+                not_iSerial = ftdi_data.group(3)
+
+                try:
+                    device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                                   base + ftdi_port + '\\0000\\Device Parameters')
+                    for param in itertools.count():
+                        name, value, type = winreg.EnumValue(device_params, param)
+                        if 'PortName' == name:
+                            port_name = value
+                            break
+                except WindowsError as e:
+                    logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                    # didn't find a portname? not sure if this is a
+                    # problem, or if this will even ever happen.
+                    continue
+
+                yield {'VID': vid,
+                       'PID': pid,
+                       'iSerial': not_iSerial,
+                       'PortName': port_name}
+            else:
+                logging.getLogger('list_ports_windows').debug('FTDI does not match pattern.');
+
             index += 1
     except WindowsError as e:
         # the end of the FTDI list
