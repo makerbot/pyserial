@@ -321,7 +321,7 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
                        'iSerial': not_iSerial,
                        'PortName': port_name}
             else:
-                logging.getLogger('list_ports_windows').debug('FTDI does not match pattern.');
+                logging.getLogger('list_ports_windows').debug('FTDI does not match pattern.')
 
             index += 1
     except WindowsError as e:
