@@ -288,8 +288,10 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     try:
         ftdibus = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
     except WindowsError as e:
-        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-        raise FTDIError
+        logging.getLogger('list_ports_windows').debug('WindowsError: ' + e.strerror)
+        #if a WindowsError occurs ftdibus is not valid so the rest of the iterator will
+        #fail, thus we raise a StopIteration exception
+        raise StopIteration
 
     try:
         for index in itertools.count():
