@@ -17,7 +17,8 @@ def portdict_from_port(port):
     data = {'blob':port}
     data['port'] = port[0]
     try:
-        if identifier_string.find('SNR=') == -1:
+        if (identifier_string.find('SNR=') == -1 or
+            identifier_string.find('SNR=None') != 0):
             vid, pid = re.search('VID:PID=([0-9A-Fa-f]{1,4}):([0-9A-Fa-f]{1,4})', identifier_string).groups()
             data['VID'] = int(vid,16)
             data['PID'] = int(pid,16)
