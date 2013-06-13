@@ -486,24 +486,24 @@ def list_ports_by_vid_pid(vid=None, pid=None):
 
     try:
         current_ports = list(enumerate_active_serial_ports())
-    except COMPORTAccessError: #catch exception that is raised if SERIALCOMM does not yet exist
-        print 'COMPORTAccessError: Could not open COM ports for listing'
-        return
-    for c_port in current_ports:
-        for r_port in recorded_ports:
-            #If the COM ports in cur and recoreded ports are the same, we want it
-           if 'PortName' in r_port and c_port[1] == r_port['PortName']:
-               try:
-                   match_dict = {'iSerial' : r_port['iSerial'],
-                                 'VID' : int(r_port['VID'], 16),
-                                 'PID' : int(r_port['PID'], 16),
+    except COMPORTAccessError as e: #catch exception that is raised if SERIALCOMM does not yet exist
+        logging.getLogger('list_ports_windows').error('Could not open COM ports for listing' + str(e))
+    else:
+        for c_port in current_ports:
+            for r_port in recorded_ports:
+               #If the COM ports in cur and recoreded ports are the same, we want it
+               if 'PortName' in r_port and c_port[1] == r_port['PortName']:
+                   try:
+                       match_dict = {'iSerial' : r_port['iSerial'],
+                                     'VID' : int(r_port['VID'], 16),
+                                     'PID' : int(r_port['PID'], 16),
 #Windows adds an address, which sees important (though it might be totally useless)
-                                 'ADDRESS' : c_port[0],
-                                 'port' : c_port[1]}
-                   #TODO: Find out if addresses do anything
-                   yield match_dict
-               except Exception as e:
-                   logging.getLogger('list_ports_windows').error('Error scanning usb devices %s' % str(e))
+                                     'ADDRESS' : c_port[0],
+                                     'port' : c_port[1]}
+                       #TODO: Find out if addresses do anything
+                       yield match_dict
+                   except Exception as e:
+                       logging.getLogger('list_ports_windows').error('Error scanning usb devices %s' % str(e))
 
 
 
