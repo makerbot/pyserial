@@ -221,12 +221,6 @@ class COMPORTAccessError(Exception):
     def __init__(self):
         pass
 
-class FTDIError(Exception):
-    """An FTDIError is raised when ...
-    """
-    def __init__(self):
-        pass
-
 def convert_to_16_bit_hex(i):
     """Given an int value >= 0 and <= 65535,
     converts it to a 16 bit hex number (i.e.
@@ -274,7 +268,7 @@ def filter_usb_dev_keys(base, vid, pid):
                    'VID': m.group(1),
                    'PID': m.group(2)}
 
-
+ftdi_vid_pid_regex = re.compile('VID_(\d+)[^+]*\+PID_(\d+)[^+]*\+(.*)')
 def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     """Lists all the FTDI ports in the FTDIBUS
     registry entry with a given VID/PID pair.
@@ -288,34 +282,43 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
     try:
         ftdibus = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
     except WindowsError as e:
-        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-        raise FTDIError
+        logging.getLogger('list_ports_windows').debug('WindowsError: ' + e.strerror)
+        # If a WindowsError occurs there has never been an FTDI plugged in.
+        # There's nothing to iterate, so we raise a StopIteration exception.
+        raise StopIteration
 
     try:
         for index in itertools.count():
             ftdi_port = winreg.EnumKey(ftdibus, index)
-            vid, pid, not_iSerial = ftdi_port.split('+')
-            vid = vid[4:] # strip the initial 'VID_'
-            pid = pid[4:] # strip the initial 'PID_'
 
-            try:
-                device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                                               base + ftdi_port + '\\0000\\Device Parameters')
-                for param in itertools.count():
-                    name, value, type = winreg.EnumValue(device_params, param)
-                    if 'PortName' == name:
-                        port_name = value
-                        break
-            except WindowsError as e:
-                logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-                # didn't find a portname? not sure if this is a
-                # problem, or if this will even ever happen.
-                continue
+            ftdi_data = ftdi_vid_pid_regex.match(ftdi_port)
+            if None != ftdi_data:
 
-            yield {'VID': vid,
-                   'PID': pid,
-                   'iSerial': not_iSerial,
-                   'PortName': port_name}
+                vid = ftdi_data.group(1)
+                pid = ftdi_data.group(2)
+                not_iSerial = ftdi_data.group(3)
+
+                try:
+                    device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                                   base + ftdi_port + '\\0000\\Device Parameters')
+                    for param in itertools.count():
+                        name, value, type = winreg.EnumValue(device_params, param)
+                        if 'PortName' == name:
+                            port_name = value
+                            break
+                except WindowsError as e:
+                    logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                    # didn't find a portname? not sure if this is a
+                    # problem, or if this will even ever happen.
+                    continue
+
+                yield {'VID': vid,
+                       'PID': pid,
+                       'iSerial': not_iSerial,
+                       'PortName': port_name}
+            else:
+                logging.getLogger('list_ports_windows').debug('FTDI does not match pattern.')
+
             index += 1
     except WindowsError as e:
         # the end of the FTDI list
@@ -483,24 +486,24 @@ def list_ports_by_vid_pid(vid=None, pid=None):
 
     try:
         current_ports = list(enumerate_active_serial_ports())
-    except COMPORTAccessError: #catch exception that is raised if SERIALCOMM does not yet exist
-        print 'COMPORTAccessError: Could not open COM ports for listing'
-        return
-    for c_port in current_ports:
-        for r_port in recorded_ports:
-            #If the COM ports in cur and recoreded ports are the same, we want it
-           if 'PortName' in r_port and c_port[1] == r_port['PortName']:
-               try:
-                   match_dict = {'iSerial' : r_port['iSerial'],
-                                 'VID' : int(r_port['VID'], 16),
-                                 'PID' : int(r_port['PID'], 16),
+    except COMPORTAccessError as e: #catch exception that is raised if SERIALCOMM does not yet exist
+        logging.getLogger('list_ports_windows').error('Could not open COM ports for listing' + str(e))
+    else:
+        for c_port in current_ports:
+            for r_port in recorded_ports:
+               #If the COM ports in cur and recoreded ports are the same, we want it
+               if 'PortName' in r_port and c_port[1] == r_port['PortName']:
+                   try:
+                       match_dict = {'iSerial' : r_port['iSerial'],
+                                     'VID' : int(r_port['VID'], 16),
+                                     'PID' : int(r_port['PID'], 16),
 #Windows adds an address, which sees important (though it might be totally useless)
-                                 'ADDRESS' : c_port[0],
-                                 'port' : c_port[1]}
-                   #TODO: Find out if addresses do anything
-                   yield match_dict
-               except Exception as E:
-                   logging.getLogger('list_ports_windows').error('Error scanning usb devices' + str(e))
+                                     'ADDRESS' : c_port[0],
+                                     'port' : c_port[1]}
+                       #TODO: Find out if addresses do anything
+                       yield match_dict
+                   except Exception as e:
+                       logging.getLogger('list_ports_windows').error('Error scanning usb devices %s' % str(e))
 
 
 

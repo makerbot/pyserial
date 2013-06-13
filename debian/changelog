@@ -1,5 +1,12 @@
+mb-pyserial (2.2) unstable; urgency=low
+
+  * Windows port listing now includes FTDI ports
+  * Other improvements to robustness of port detection on windows
+
+ -- MakerBot <dev@makerbot.com>  Wed, 15 May 2013 13:45:00 -0500
+
 mb-pyserial (0.01) unstable; urgency=low
 
-  * Initial release 
+  * Initial release
 
  -- MakerBot <dev@makerbot.com>  Thu, 31 Jan 2013 11:11:06 -0500
