@@ -56,8 +56,7 @@ env.MBCreateInstallTarget()
 #env.Command('pyparallel/build', 'pyparallel/setup.py',
 #            'cd pyparallel;python setup.py build')
 
-env.CleanAction('pyserial_clean', Action(['rm -r pyserial/build']))
-#env.CleanAction('pyparallel_clean', Action(['rm -r pyparallel/build'])
+env.Clean('build', 'build')
 
 if run_test:
     env.Command('pyserial_test', 'pyserial/test/test.py',
