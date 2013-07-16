@@ -4,5 +4,5 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/scons.mk
 
 # DEBUILD_DPKG_BUILDPACKAGE_OPTS="-us -uc -sa -i -I"
-DEB_SCONS_OPTIONS := install_prefix=$(DEB_DESTDIR)/usr config_prefix=$(DEB_DESTDIR)/etc
+DEB_SCONS_OPTIONS := install_prefix=$(DEB_DESTDIR)/usr config_prefix=$(DEB_DESTDIR)/etc --no-devel-libs
 DEB_SCONS_INSTALL_OPTIONS := DESTDIR=$(DEB_DESTDIR)
