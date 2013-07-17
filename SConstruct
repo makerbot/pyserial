@@ -1,2 +1,3 @@
 
-SConscript('SConscript', variant_dir='obj/', duplicate=1)
+# we don't do variant dir for python projects
+SConscript('SConscript')
