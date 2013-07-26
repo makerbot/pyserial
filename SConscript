@@ -12,10 +12,4 @@ env.MBInstallEgg(pyserial_egg)
 env.Clean(pyserial_egg, '#/dist')
 env.Clean(pyserial_egg, '#/pyserial.egg-info')
 
-if env.MBIsMac():
-    pyserial_egg26 = env.MBDistEggTwoSix('dist/pyserial-2.7_mb2.1', source)
-    env.MBInstallEgg(pyserial_egg26)
-    env.Clean(pyserial_egg26, '#/dist')
-    env.Clean(pyserial_egg26, '#/pyserial.egg-info')
-
 env.MBCreateInstallTarget()
