@@ -1,3 +1,4 @@
 
-# we don't do variant dir for python projects
-SConscript('SConscript')
+env = Environment(tools = ['mb_sconstruct'])
+
+env.MBSConscript('SConscript', python_project = True)
