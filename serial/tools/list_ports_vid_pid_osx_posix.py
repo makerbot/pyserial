@@ -17,10 +17,16 @@ def portdict_from_port(port):
     data = {'blob':port}
     data['port'] = port[0]
     try:
-        vid, pid, serial_number = re.search('VID:PID=([0-9A-Fa-f]{1,4}):([0-9A-Fa-f]{1,4}) SNR=(\w*)', identifier_string).groups()
-        data['VID'] = int(vid,16)
-        data['PID'] = int(pid,16)
-        data['iSerial'] = serial_number
+        if 'SNR=None' in identifier_string or 'SNR' not in identifier_string:
+            vid, pid = re.search('VID:PID=([0-9A-Fa-f]{1,4}):([0-9A-Fa-f]{1,4})', identifier_string).groups()
+            data['VID'] = int(vid,16)
+            data['PID'] = int(pid,16)
+            data['iSerial'] = '00000000000000000000'
+        else:
+            vid, pid, serial_number = re.search('VID:PID=([0-9A-Fa-f]{1,4}):([0-9A-Fa-f]{1,4}) SNR=(\w*)', identifier_string).groups()
+            data['VID'] = int(vid,16)
+            data['PID'] = int(pid,16)
+            data['iSerial'] = serial_number
     except AttributeError:
         pass
     return data   
