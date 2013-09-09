@@ -486,8 +486,11 @@ def list_ports_by_vid_pid(vid=None, pid=None):
 
     try:
         current_ports = list(enumerate_active_serial_ports())
-    except COMPORTAccessError as e: #catch exception that is raised if SERIALCOMM does not yet exist
-        logging.getLogger('list_ports_windows').error('Could not open COM ports for listing' + str(e))
+    except COMPORTAccessError as e:
+        # catch exception that is raised if SERIALCOMM does not yet exist.
+        # This seems to happen between booting up and plugging in the first serial device. It's not
+        # necessarily an error, just indicates that there haven't been any devices plugged in, yet.
+        logging.getLogger('list_ports_windows').debug('Could not open COM ports for listing' + str(e))
     else:
         for c_port in current_ports:
             for r_port in recorded_ports:
