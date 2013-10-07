@@ -240,8 +240,8 @@ def convert_to_16_bit_hex(i):
     return h
 
 def filter_usb_dev_keys(base, vid, pid):
-    vidpattern = ".*"
-    pidpattern = ".*"
+    vidpattern = "[0-9A-Fa-f]{4}"
+    pidpattern = "[0-9A-Fa-f]{4}"
 
     if vid is not None:
         vidpattern = convert_to_16_bit_hex(vid)
