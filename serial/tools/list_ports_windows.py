@@ -294,28 +294,29 @@ def enumerate_ftdi_ports_by_vid_pid(vid, pid):
             ftdi_data = ftdi_vid_pid_regex.match(ftdi_port)
             if None != ftdi_data:
 
-                vid = ftdi_data.group(1)
-                pid = ftdi_data.group(2)
+                current_vid = ftdi_data.group(1)
+                current_pid = ftdi_data.group(2)
                 not_iSerial = ftdi_data.group(3)
 
-                try:
-                    device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                                                   base + ftdi_port + '\\0000\\Device Parameters')
-                    for param in itertools.count():
-                        name, value, type = winreg.EnumValue(device_params, param)
-                        if 'PortName' == name:
-                            port_name = value
-                            break
-                except WindowsError as e:
-                    logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
-                    # didn't find a portname? not sure if this is a
-                    # problem, or if this will even ever happen.
-                    continue
+                if (vid == None or vid == current_vid) and (pid == None or pid == current_pid):
+                    try:
+                        device_params = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                                       base + ftdi_port + '\\0000\\Device Parameters')
+                        for param in itertools.count():
+                            name, value, type = winreg.EnumValue(device_params, param)
+                            if 'PortName' == name:
+                                port_name = value
+                                break
+                    except WindowsError as e:
+                        logging.getLogger('list_ports_windows').error('WindowsError: ' + e.strerror)
+                        # didn't find a portname? not sure if this is a
+                        # problem, or if this will even ever happen.
+                        continue
 
-                yield {'VID': vid,
-                       'PID': pid,
-                       'iSerial': not_iSerial,
-                       'PortName': port_name}
+                    yield {'VID': current_vid,
+                           'PID': current_pid,
+                           'iSerial': not_iSerial,
+                           'PortName': port_name}
             else:
                 logging.getLogger('list_ports_windows').debug('FTDI does not match pattern.')
 
