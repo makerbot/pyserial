@@ -14,6 +14,7 @@
 
 import sys, os, fcntl, termios, struct, select, errno, time
 import tempfile
+import subprocess
 from serial.serialutil import *
 
 # Do check the Python version as some constants have moved.
@@ -278,35 +279,60 @@ def findLockDir():
 def getLockfilePath(devName):
 	return os.path.join(findLockDir(),'LCK..'+devName)
 
-def acquireLock(path, secondTry = False):
-    try:
-        fhLock = os.open(path, os.O_EXCL|os.O_CREAT|os.O_RDWR)
-        os.write(fhLock,str(os.getpid())+"\n")
-        os.close(fhLock)
-        return True
-    except OSError as oserr:
-        import errno
-        if oserr.errno == errno.EEXIST and not secondTry:
-            # Check for stale lockfile.            
-            lf = os.open(path, os.O_RDONLY)
-            try:
-                lockedPid = int(os.read(lf,100))
-            except ValueError:
-                # stale lock detection here should be based on lock age
-                raise SerialException("could not acquire lock for %s; locked by unknown process " %( path ))
-            os.close(lf)
-            try:
-                os.kill(lockedPid,0)
-            except OSError:
-                # Stale lock file!
-                print "Stale lock file found; attempting to remove."
-                os.unlink(path)
-                return acquireLock(path, True)
-            raise SerialException( "could not open port %s: locked by PID %d" %( path, lockedPid ) )
-        raise SerialException( "could not open port %s: errno %d (%s)" %( path, oserr.errno, os.strerror(oserr.errno) ) )         
-    except Exception:
-        raise
-    raise SerialException("could not open lockfile %s" %( path ))
+use_lockdev = [None]
+
+def acquireLock(port, path, secondTry = False):
+    if use_lockdev[0] is None:
+        #check if lockdev is available
+        try:
+            subprocess.call(['/usr/sbin/lockdev'])
+            use_lockdev[0] = True
+        except OSError as e:
+            use_lockdev[0] = False
+
+    if use_lockdev[0]:
+        try:
+            subprocess.check_call(['/usr/sbin/lockdev', '-l', port])
+        except subprocess.CalledProcessError as e:
+            raise SerialException('lockdev failed with code ' + e.returncode)
+    else:
+        try:
+            fhLock = os.open(path, os.O_EXCL|os.O_CREAT|os.O_RDWR)
+            os.write(fhLock,str(os.getpid())+"\n")
+            os.close(fhLock)
+            return True
+        except OSError as oserr:
+            import errno
+            if oserr.errno == errno.EEXIST and not secondTry:
+                # Check for stale lockfile.            
+                lf = os.open(path, os.O_RDONLY)
+                try:
+                    lockedPid = int(os.read(lf,100))
+                except ValueError:
+                    # stale lock detection here should be based on lock age
+                    raise SerialException("could not acquire lock for %s; locked by unknown process " %( path ))
+                os.close(lf)
+                try:
+                    os.kill(lockedPid,0)
+                except OSError:
+                    # Stale lock file!
+                    print "Stale lock file found; attempting to remove."
+                    os.unlink(path)
+                    return acquireLock(path, True)
+                raise SerialException( "could not open port %s: locked by PID %d" %( path, lockedPid ) )
+            raise SerialException( "could not open port %s: errno %d (%s)" %( path, oserr.errno, os.strerror(oserr.errno) ) )         
+        except Exception:
+            raise
+        raise SerialException("could not open lockfile %s" %( path ))
+
+def releaseLock(port, path):
+    if use_lockdev[0]:
+        try:
+            subprocess.check_call(['/usr/sbin/lockdev', '-u', port])
+        except subprocess.CalledProcessError as e:
+            raise SerialException('lockdev failed with code ' + e.returncode)
+    else:
+        os.remove(path)
 
 class PosixSerial(SerialBase):
     """Serial port class POSIX implementation. Serial port configuration is 
@@ -333,7 +359,7 @@ class PosixSerial(SerialBase):
         base = self._port.split('/')[-1]
         self.lockfilename = getLockfilePath(base)
         self.welocked = False
-        self.welocked = acquireLock(self.lockfilename)
+        self.welocked = acquireLock(self._port, self.lockfilename)
 
         try:
             self._reconfigurePort()
@@ -481,7 +507,7 @@ class PosixSerial(SerialBase):
                 self.fd = None
             self._isOpen = False
             if self.welocked is not None and self.welocked is True and self.lockfilename is not None:
-                os.remove(self.lockfilename)
+                releaseLock(self._port, self.lockfilename)
 		self.welocked = False
 
     def makeDeviceName(self, port):
