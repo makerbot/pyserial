@@ -318,7 +318,7 @@ def acquireLock(port, path, secondTry = False):
                     # Stale lock file!
                     print "Stale lock file found; attempting to remove."
                     os.unlink(path)
-                    return acquireLock(path, True)
+                    return acquireLock(port, path, True)
                 raise SerialException( "could not open port %s: locked by PID %d" %( path, lockedPid ) )
             raise SerialException( "could not open port %s: errno %d (%s)" %( path, oserr.errno, os.strerror(oserr.errno) ) )         
         except Exception:
