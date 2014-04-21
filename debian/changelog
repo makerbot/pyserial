@@ -1,3 +1,15 @@
+mb-pyserial (3.0.1) precise; urgency=low
+
+  * 3.0.1 release
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Mon, 07 Apr 2014 11:21:23 -0400
+
+mb-pyserial (3.0.0) precise; urgency=low
+
+  * 3.0.0 release
+
+ -- MakerBot Industries dev team <dev@makerbot.com>  Tue, 04 Mar 2014 18:23:28 -0500
+
 mb-pyserial (2.3.2) precise; urgency=low
 
   * 2.3.2 release
