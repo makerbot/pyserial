@@ -311,15 +311,18 @@ def acquireLock(port, path, secondTry = False):
                 except ValueError:
                     # stale lock detection here should be based on lock age
                     raise SerialException("could not acquire lock for %s; locked by unknown process " %( path ))
+                if lockedPid == os.getpid():
+                    # We already own the lock, just return
+                    return True
+
                 os.close(lf)
                 try:
                     os.kill(lockedPid,0)
                 except OSError:
                     # Stale lock file!
-                    print "Stale lock file found; attempting to remove."
                     os.unlink(path)
                     return acquireLock(port, path, True)
-                raise SerialException( "could not open port %s: locked by PID %d" %( path, lockedPid ) )
+                raise SerialException( "pid %d could not open port %s: locked by PID %d" %( os.getpid(), path, lockedPid ) )
             raise SerialException( "could not open port %s: errno %d (%s)" %( path, oserr.errno, os.strerror(oserr.errno) ) )         
         except Exception:
             raise
@@ -352,7 +355,7 @@ class PosixSerial(SerialBase):
             self.fd = os.open(self.portstr, os.O_RDWR|os.O_NOCTTY|os.O_NONBLOCK)
         except Exception, msg:
             self.fd = None
-            raise SerialException("could not open port %s: %s" % (self._port, msg))
+            raise SerialException("could not open port %s,%s: %s" % (self._port, self.portstr, msg))
         #~ fcntl.fcntl(self.fd, FCNTL.F_SETFL, 0)  # set blocking
         
         #create lockfile for port
