@@ -8,10 +8,16 @@
 #
 # For Python 3.x use the corresponding Python executable,
 # e.g. "python3 setup.py ..."
+import sys
+import os
+import setuptools
+print("ARGS: " + sys.argv[1])
+print("CWD: " + os.getcwd())
+
 from ez_setup import use_setuptools
 use_setuptools()
 
-import sys
+
 
 from distutils.core import setup
 
