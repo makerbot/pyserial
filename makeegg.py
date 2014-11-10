@@ -5,4 +5,5 @@ import subprocess
 import setuptools
 if (sys.argv > 1):
     print sys.argv[1]
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
     subprocess.call('python setup.py ' + sys.argv[1], shell=True)

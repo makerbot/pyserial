@@ -6,9 +6,9 @@ add_custom_command(
     OUTPUT
         ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg
     COMMAND ${PYTHON_EXECUTABLE}
-        ${PROJECT_SOURCE_DIR}/makeegg.py bdist_egg
+        ${CMAKE_SOURCE_DIR}/Toolchain/pyserial/makeegg.py bdist_egg
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_SOURCE_DIR}/dist/pyserial-2.7_mb2.1-py2.7.egg
+        ${CMAKE_SOURCE_DIR}/Toolchain/pyserial/dist/pyserial-2.7_mb2.1-py2.7.egg
         ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
 
 add_custom_target(pyserial ALL DEPENDS
