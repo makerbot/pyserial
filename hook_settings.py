@@ -2,7 +2,8 @@
 import hook_tools
 
 hooks = [
-    'pre-commit'
+    'pre-commit',
+    'prepare-commit-msg'
 ]
 
 pre_commit_checks = [
