@@ -3,3 +3,4 @@ build
 dist
 pyserial.egg-info
 .sconsign.dblite
+*.bak

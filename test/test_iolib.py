@@ -46,7 +46,7 @@ import serial
 # like u'nicode' strings with the prefix and it is not providing an unicode
 # function ('str' is now what 'unicode' used to be)
 if sys.version_info >= (3, 0):
-    def unicode(x): return x
+    def str(x): return x
 
 
 # on which port should the tests be performed:
@@ -62,10 +62,10 @@ class Test_SerialAndIO(unittest.TestCase):
         self.s.close()
 
     def test_hello_raw(self):
-        self.io.write(unicode("hello\n"))
+        self.io.write(str("hello\n"))
         self.io.flush() # it is buffering. required to get the data out
         hello = self.io.readline()
-        self.failUnlessEqual(hello, unicode("hello\n"))
+        self.assertEqual(hello, str("hello\n"))
 
 
 if __name__ == '__main__':

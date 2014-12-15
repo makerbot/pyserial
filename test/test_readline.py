@@ -53,16 +53,16 @@ class Test_Readline(unittest.TestCase):
     def test_readline(self):
         """Test readline method"""
         self.s.write(serial.to_bytes("1\n2\n3\n"))
-        self.failUnlessEqual(self.s.readline(), serial.to_bytes("1\n"))
-        self.failUnlessEqual(self.s.readline(), serial.to_bytes("2\n"))
-        self.failUnlessEqual(self.s.readline(), serial.to_bytes("3\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes("1\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes("2\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes("3\n"))
         # this time we will get a timeout
-        self.failUnlessEqual(self.s.readline(), serial.to_bytes(""))
+        self.assertEqual(self.s.readline(), serial.to_bytes(""))
 
     def test_readlines(self):
         """Test readlines method"""
         self.s.write(serial.to_bytes("1\n2\n3\n"))
-        self.failUnlessEqual(
+        self.assertEqual(
                 self.s.readlines(),
                 [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
                 )
@@ -71,8 +71,8 @@ class Test_Readline(unittest.TestCase):
         """Test xreadlines method (skipped for io based systems)"""
         if hasattr(self.s, 'xreadlines'):
             self.s.write(serial.to_bytes("1\n2\n3\n"))
-            self.failUnlessEqual(
-                    list(self.s.xreadlines()),
+            self.assertEqual(
+                    list(self.s),
                     [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
                     )
 
@@ -82,7 +82,7 @@ class Test_Readline(unittest.TestCase):
         lines = []
         for line in self.s:
             lines.append(line)
-        self.failUnlessEqual(
+        self.assertEqual(
                 lines,
                 [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
                 )
@@ -91,7 +91,7 @@ class Test_Readline(unittest.TestCase):
         """Test readline with alternative eol settings (skipped for io based systems)"""
         if hasattr(self.s, 'xreadlines'): # test if it is our FileLike base class
             self.s.write(serial.to_bytes("no\rno\nyes\r\n"))
-            self.failUnlessEqual(
+            self.assertEqual(
                     self.s.readline(eol=serial.to_bytes("\r\n")),
                     serial.to_bytes("no\rno\nyes\r\n"))
 

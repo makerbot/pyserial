@@ -64,7 +64,7 @@ import time
 import struct
 import socket
 import threading
-import Queue
+import queue
 import logging
 
 # port string is expected to be something like this:
@@ -202,14 +202,14 @@ RFC2217_PARITY_MAP = {
     PARITY_MARK: 4,
     PARITY_SPACE: 5,
 }
-RFC2217_REVERSE_PARITY_MAP = dict((v,k) for k,v in RFC2217_PARITY_MAP.items())
+RFC2217_REVERSE_PARITY_MAP = dict((v,k) for k,v in list(RFC2217_PARITY_MAP.items()))
 
 RFC2217_STOPBIT_MAP = {
     STOPBITS_ONE: 1,
     STOPBITS_ONE_POINT_FIVE: 3,
     STOPBITS_TWO: 2,
 }
-RFC2217_REVERSE_STOPBIT_MAP = dict((v,k) for k,v in RFC2217_STOPBIT_MAP.items())
+RFC2217_REVERSE_STOPBIT_MAP = dict((v,k) for k,v in list(RFC2217_STOPBIT_MAP.items()))
 
 # Telnet filter states
 M_NORMAL = 0
@@ -369,7 +369,7 @@ class RFC2217Serial(SerialBase):
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._socket.connect(self.fromURL(self.portstr))
             self._socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        except Exception, msg:
+        except Exception as msg:
             self._socket = None
             raise SerialException("Could not open port %s: %s" % (self.portstr, msg))
 
@@ -377,7 +377,7 @@ class RFC2217Serial(SerialBase):
 
         # use a thread save queue as buffer. it also simplifies implementing
         # the read timeout
-        self._read_buffer = Queue.Queue()
+        self._read_buffer = queue.Queue()
         # to ensure that user writes does not interfere with internal
         # telnet/rfc2217 options establish a lock
         self._write_lock = threading.Lock()
@@ -460,7 +460,7 @@ class RFC2217Serial(SerialBase):
 
         # Setup the connection
         # to get good performance, all parameter changes are sent first...
-        if not isinstance(self._baudrate, (int, long)) or not 0 < self._baudrate < 2**32:
+        if not isinstance(self._baudrate, int) or not 0 < self._baudrate < 2**32:
             raise ValueError("invalid baudrate: %r" % (self._baudrate))
         self._rfc2217_port_settings['baudrate'].set(struct.pack('!I', self._baudrate))
         self._rfc2217_port_settings['datasize'].set(struct.pack('!B', self._bytesize))
@@ -468,7 +468,7 @@ class RFC2217Serial(SerialBase):
         self._rfc2217_port_settings['stopsize'].set(struct.pack('!B', RFC2217_STOPBIT_MAP[self._stopbits]))
 
         # and now wait until parameters are active
-        items = self._rfc2217_port_settings.values()
+        items = list(self._rfc2217_port_settings.values())
         if self.logger:
             self.logger.debug("Negotiating settings: %s" % (items,))
         timeout_time = time.time() + self._network_timeout
@@ -541,7 +541,7 @@ class RFC2217Serial(SerialBase):
             host, port = url.split(':', 1) # may raise ValueError because of unpacking
             port = int(port)               # and this if it's not a number
             if not 0 <= port < 65536: raise ValueError("port not in range 0...65535")
-        except ValueError, e:
+        except ValueError as e:
             raise SerialException('expected a string in the form "[rfc2217://]<host>:<port>[/option[/option...]]": %s' % e)
         return (host, port)
 
@@ -563,7 +563,7 @@ class RFC2217Serial(SerialBase):
                 if self._thread is None:
                     raise SerialException('connection failed (reader thread died)')
                 data.append(self._read_buffer.get(True, self._timeout))
-        except Queue.Empty: # -> timeout
+        except queue.Empty: # -> timeout
             pass
         return bytes(data)
 
@@ -576,7 +576,7 @@ class RFC2217Serial(SerialBase):
         try:
             try:
                 self._socket.sendall(data.replace(IAC, IAC_DOUBLED))
-            except socket.error, e:
+            except socket.error as e:
                 raise SerialException("connection failed (socket error): %s" % e) # XXX what exception if socket connection fails
         finally:
             self._write_lock.release()
@@ -672,7 +672,7 @@ class RFC2217Serial(SerialBase):
                     # just need to get out of recv form time to time to check if
                     # still alive
                     continue
-                except socket.error, e:
+                except socket.error as e:
                     # connection fails -> terminate loop
                     if self.logger:
                         self.logger.debug("socket error in reader thread: %s" % (e,))
@@ -770,7 +770,7 @@ class RFC2217Serial(SerialBase):
             elif suboption[1:2] == FLOWCONTROL_RESUME:
                 self._remote_suspend_flow = False
             else:
-                for item in self._rfc2217_options.values():
+                for item in list(self._rfc2217_options.values()):
                     if item.ack_option == suboption[1:2]:
                         #~ print "processing COM_PORT_OPTION: %r" % list(suboption[1:])
                         item.checkAnswer(bytes(suboption[2:]))
@@ -1087,7 +1087,7 @@ class PortManager(object):
                 backup = self.serial.baudrate
                 try:
                     (self.serial.baudrate,) = struct.unpack("!I", suboption[2:6])
-                except ValueError, e:
+                except ValueError as e:
                     if self.logger:
                         self.logger.error("failed to set baud rate: %s" % (e,))
                     self.serial.baudrate = backup
@@ -1099,7 +1099,7 @@ class PortManager(object):
                 backup = self.serial.bytesize
                 try:
                     (self.serial.bytesize,) = struct.unpack("!B", suboption[2:3])
-                except ValueError, e:
+                except ValueError as e:
                     if self.logger:
                         self.logger.error("failed to set data size: %s" % (e,))
                     self.serial.bytesize = backup
@@ -1111,7 +1111,7 @@ class PortManager(object):
                 backup = self.serial.parity
                 try:
                     self.serial.parity = RFC2217_REVERSE_PARITY_MAP[struct.unpack("!B", suboption[2:3])[0]]
-                except ValueError, e:
+                except ValueError as e:
                     if self.logger:
                         self.logger.error("failed to set parity: %s" % (e,))
                     self.serial.parity = backup
@@ -1126,7 +1126,7 @@ class PortManager(object):
                 backup = self.serial.stopbits
                 try:
                     self.serial.stopbits = RFC2217_REVERSE_STOPBIT_MAP[struct.unpack("!B", suboption[2:3])[0]]
-                except ValueError, e:
+                except ValueError as e:
                     if self.logger:
                         self.logger.error("failed to set stop bits: %s" % (e,))
                     self.serial.stopbits = backup

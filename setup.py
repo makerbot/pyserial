@@ -44,7 +44,7 @@ if sys.version >= '2.3' and sys.version < '3.0':
   import serial
   version = serial.__version__
 
-elif sys.version >= 3.0:
+elif sys.version >= '3.0':
   import re, os
   version = re.search(
         "__version__.*'(.+)'",

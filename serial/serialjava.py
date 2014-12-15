@@ -66,7 +66,7 @@ class JavaSerial(SerialBase):
             portId = comm.CommPortIdentifier.getPortIdentifier(device(self._port))     # numbers are transformed to a comport id obj
         try:
             self.sPort = portId.open("python serial module", 10)
-        except Exception, msg:
+        except Exception as msg:
             self.sPort = None
             raise SerialException("Could not open port: %s" % msg)
         self._reconfigurePort()

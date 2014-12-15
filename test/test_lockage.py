@@ -20,7 +20,7 @@ import mock
 class TestLocking(unittest.TestCase):
 	
     def test_lockHappens(self):
-        port = raw_input("specify an actual com port >")
+        port = input("specify an actual com port >")
         x = serial.Serial(port)
         #check that HSF Lockfile exists
         base, file = os.path.split(port)
