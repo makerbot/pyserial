@@ -45,3 +45,5 @@ add_custom_command(
 
 add_custom_target(pyserial ALL DEPENDS
     ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
+
+add_subdirectory(documentation)
