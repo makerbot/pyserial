@@ -1,13 +1,10 @@
 message("configureing pyserial")
 cmake_minimum_required(VERSION 2.8.3)
 project(pyserial)
-set(utils ${CMAKE_SOURCE_DIR}/../../mw-cmake-tools/utils.cmake)
-if(EXISTS "${utils}")
-    include("../../mw-cmake-tools/utils.cmake")
-    set(TR_BUILD true)
-else()
-    include("build/mw-cmake-tools/utils.cmake")
-endif()
+set(MBCMakeTools_DIR ${PROJECT_SOURCE_DIR}/../../mw-cmake-tools/)
+find_package(
+    MBCMakeTools
+    REQUIRED)
 setup_environment()
 message("building egg")
 
