@@ -42,5 +42,11 @@ add_custom_command(
 
 add_custom_target(pyserial ALL DEPENDS
     ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
+enable_testing()
+
+add_test(NAME pyserialTests
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMAND ${PYTHON_EXECUTABLE}
+    ${PROJECT_SOURCE_DIR}/test/run_all_tests.py)
 
 add_subdirectory(documentation)
