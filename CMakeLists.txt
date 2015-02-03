@@ -37,12 +37,12 @@ add_custom_command(
         ${PROJECT_SOURCE_DIR}/serial/serialcli.py)
 
 add_custom_target(pyserial ALL DEPENDS
-    ${PROJECT_SOURCE_DIR}/dist/pyserial-2.7_mb2.1-py2.7.egg)
+    ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
+enable_testing()
 
-install(FILES
-    ${PROJECT_SOURCE_DIR}/dist/pyserial-2.7_mb2.1-py2.7.egg
-     DESTINATION
-    ${EGG_OUTPUT_PATH})
-
+add_test(NAME pyserialTests
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMAND ${PYTHON_EXECUTABLE}
+    ${PROJECT_SOURCE_DIR}/test/run_all_tests.py)
 
 add_subdirectory(documentation)
