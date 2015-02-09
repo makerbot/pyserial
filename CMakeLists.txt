@@ -6,6 +6,8 @@ find_package(
     MBCMakeTools
     REQUIRED)
 
+set_python()
+
 add_custom_command(
     OUTPUT
         ${PROJECT_SOURCE_DIR}/dist/pyserial-2.7_mb2.1-py2.7.egg
