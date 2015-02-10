@@ -1,12 +1,13 @@
-message("configureing pyserial")
+
 cmake_minimum_required(VERSION 2.8.3)
+
 project(pyserial)
 
 find_package(
     MBCMakeTools
     REQUIRED)
 
-set_python()
+find_package(PythonInterp REQUIRED)()
 
 add_custom_command(
     OUTPUT
