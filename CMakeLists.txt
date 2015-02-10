@@ -44,5 +44,11 @@ install(FILES
      DESTINATION
     ${EGG_OUTPUT_PATH})
 
+enable_testing()
+
+add_test(NAME pyserialTests
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMAND ${PYTHON_EXECUTABLE}
+    ${PROJECT_SOURCE_DIR}/test/run_all_tests.py)
 
 add_subdirectory(documentation)
