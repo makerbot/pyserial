@@ -24,10 +24,7 @@ if len(sys.argv) > 1:
 
 # find files and the tests in them
 mainsuite = unittest.TestSuite()
-for modulename in [os.path.splitext(x)[0]
-    for x in os.listdir('.')
-        if x != __file__ and x.startswith("test") and x.endswith(".py")
-]:
+for modulename in [sys.argv[2]]:
     try:
         module = __import__(modulename)
     except ImportError:
@@ -39,7 +36,7 @@ for modulename in [os.path.splitext(x)[0]
         mainsuite.addTest(testsuite)
 
 verbosity = 1
-if '-v' in sys.argv[1:]:
+if '-v' in sys.argv[2:]:
     verbosity = 2
 
 # run the collected tests
