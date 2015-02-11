@@ -40,9 +40,24 @@ add_custom_target(pyserial ALL DEPENDS
     ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
 enable_testing()
 
-add_test(NAME pyserialTests
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMAND ${PYTHON_EXECUTABLE}
-    ${PROJECT_SOURCE_DIR}/test/run_all_tests.py)
-
+set(tests
+    test_readline
+    test_iolib
+    test_list_ports_windows
+    test_lockage
+    test_list_ports_vid_pid_osx_posix
+    test
+    handlers/protocol_test
+    handlers/__init__
+    test_url
+    test_high_load
+    test_advanced)
+foreach(t ${tests})
+    add_test(NAME ${t}
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test"
+        COMMAND sudo ${PYTHON_EXECUTABLE}
+        "${PROJECT_SOURCE_DIR}/test/run_all_tests.py"
+            "/dev/ttyACM0"
+            "${t}" -v)
+endforeach()
 add_subdirectory(documentation)
