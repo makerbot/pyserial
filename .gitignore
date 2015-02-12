@@ -3,3 +3,7 @@ build
 dist
 pyserial.egg-info
 .sconsign.dblite
+
+# default cmake build folders
+_build
+_build64
