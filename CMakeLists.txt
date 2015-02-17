@@ -6,7 +6,7 @@ find_package(
     MBCMakeTools
     REQUIRED)
 
-set_python()
+find_package(PythonInterp)
 
 add_custom_command(
     OUTPUT
