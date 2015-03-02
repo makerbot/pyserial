@@ -13,11 +13,12 @@ set(setup_py ${PROJECT_SOURCE_DIR}/setup.py)
 
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${setup_py} --fullname
-    OUTPUT_VARIABLE egg_name
+    OUTPUT_VARIABLE egg_basename
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 set(dist_dir ${PROJECT_BINARY_DIR}/dist)
-set(egg ${dist_dir}/${egg_name}-py2.7.egg)
+set(egg_name ${egg_basename}-py2.7.egg)
+set(egg ${dist_dir}/${egg_name})
 
 add_custom_command(
     OUTPUT
@@ -59,6 +60,11 @@ add_custom_target(pyserial ALL DEPENDS ${egg})
 install(
     FILES ${egg}
     DESTINATION ${EGG_OUTPUT_PATH})
+
+install_egg_config(
+    NAME Pyserial
+    EGG_NAME pyserial
+    EGG_LOCATION ${EGG_OUTPUT_PATH}/${egg_name})
 
 enable_testing()
 
