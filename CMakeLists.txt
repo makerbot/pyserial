@@ -1,18 +1,36 @@
-message("configureing pyserial")
-cmake_minimum_required(VERSION 2.8.3)
-project(pyserial)
 
-find_package(
-    MBCMakeTools
-    REQUIRED)
+cmake_minimum_required(VERSION 2.8.3)
+
+project(pyserial NONE)
+
+find_package(MBCMakeTools REQUIRED)
 
 find_package(PythonInterp)
 
+check_for_setuptools()
+
+set(setup_py ${PROJECT_SOURCE_DIR}/setup.py)
+
+execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} ${setup_py} --fullname
+    OUTPUT_VARIABLE egg_name
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+set(dist_dir ${PROJECT_BINARY_DIR}/dist)
+set(egg ${dist_dir}/${egg_name}-py2.7.egg)
+
 add_custom_command(
     OUTPUT
-        ${PROJECT_SOURCE_DIR}/dist/pyserial-2.7_mb2.1-py2.7.egg
-    COMMAND ${PYTHON_EXECUTABLE}
-        ${PROJECT_SOURCE_DIR}/makeegg.py bdist_egg
+        ${egg}
+    COMMAND
+        ${PYTHON_EXECUTABLE}
+        ${setup_py}
+        bdist_egg
+        --bdist-dir ${PROJECT_BINARY_DIR}/bdist-tmp
+        --dist-dir ${dist_dir}
+    WORKING_DIRECTORY
+        ${PROJECT_SOURCE_DIR}
+    VERBATIM
     DEPENDS
         ${PROJECT_SOURCE_DIR}/serial/serialposix.py
         ${PROJECT_SOURCE_DIR}/serial/urlhandler/protocol_socket.py
@@ -36,8 +54,12 @@ add_custom_command(
         ${PROJECT_SOURCE_DIR}/serial/serialutil.py
         ${PROJECT_SOURCE_DIR}/serial/serialcli.py)
 
-add_custom_target(pyserial ALL DEPENDS
-    ${EGG_OUTPUT_PATH}/pyserial-2.7_mb2.1-py2.7.egg)
+add_custom_target(pyserial ALL DEPENDS ${egg})
+
+install(
+    FILES ${egg}
+    DESTINATION ${EGG_OUTPUT_PATH})
+
 enable_testing()
 
 set(tests

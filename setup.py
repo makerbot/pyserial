@@ -11,13 +11,9 @@
 import sys
 import os
 import setuptools
-print("ARGS: " + sys.argv[1])
-print("CWD: " + os.getcwd())
 
 from ez_setup import use_setuptools
 use_setuptools()
-
-
 
 from distutils.core import setup
 
@@ -62,7 +58,7 @@ setup(
     description = "Python Serial Port Extension Extended by Makerbot Industries",
     version = version,
     author = ["Chris Liechti", "Matt Mets", "David Sayles"],
-    author_email = ["cliechti@gmx.net", "david.sayles@makerbot.com"],
+    author_email = ["cliechti@gmx.net", "software.autouser@makerbot.com"],
     url = ["http://pyserial.sourceforge.net/", "http://github.com/makerbot/pyserial"],
     packages = ['serial', 'serial.tools', 'serial.urlhandler'],
     license = "Python",
