@@ -3,7 +3,7 @@ import os
 env = Environment(
     ENV=os.environ,
     tools=['default', 'mb_install'],
-    toolpath=['#/../mw-scons-tools'])
+    toolpath=['#/../mw-scons-tools', '#/Install/mw-scons-tools'])
 
 source = env.MBMagicPythonGlob('serial')
 
