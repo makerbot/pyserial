@@ -7,9 +7,9 @@
 # this is distributed under a free software license, see license.txt
 
 #this variable is kept for backwards compatability
-VERSION = '2.7-mb2.1'
+VERSION = '4.0'
 
-__version__ = '2.7-mb2.1' #for new naming standard compatiblity, we use _
+__version__ = '4.0' #for new naming standard compatiblity, we use _
 #MakerBot sub-version is after the'mb' tab
 
 import sys

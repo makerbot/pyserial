@@ -13,7 +13,7 @@ import time
 
 # inject local copy to avoid testing the installed version instead of the
 # working copy
-sys.path.insert(0, '..')
+sys.path.insert(0, '.')
 
 import serial
 print("Patching sys.path to test local version. Testing Version: %s" % (serial.VERSION,))
@@ -25,7 +25,7 @@ if len(sys.argv) > 1:
 # find files and the tests in them
 mainsuite = unittest.TestSuite()
 for modulename in [os.path.splitext(x)[0]
-    for x in os.listdir('.')
+    for x in os.listdir('./test')
         if x != __file__ and x.startswith("test") and x.endswith(".py")
 ]:
     try:

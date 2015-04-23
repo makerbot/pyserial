@@ -56,7 +56,7 @@ class Test_SerialAndIO(unittest.TestCase):
 
     def setUp(self):
         self.s = serial.serial_for_url(PORT, timeout=1)
-        self.io = io.TextIOWrapper(io.BufferedRWPair(self.s, self.s))
+        self.io = io.TextIOWrapper(io.BufferedRWPair(io.BufferedRandom(self.s), io.bufferedRandom(self.s)))
 
     def tearDown(self):
         self.s.close()

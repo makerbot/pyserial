@@ -1,9 +1,10 @@
 import os
+import sys
 
 env = Environment(
     ENV=os.environ,
-    tools=['default', 'mb_install'],
-    toolpath=['#/../mw-scons-tools'])
+    tools=['default', 'mb_install', 'mb_test'],
+    toolpath=['#/../mw-scons-tools', '#/Install/mw-scons-tools'])
 
 source = env.MBMagicPythonGlob('serial')
 
@@ -16,3 +17,6 @@ env.Clean(pyserial_egg, '#/dist')
 env.Clean(pyserial_egg, '#/pyserial.egg-info')
 
 env.MBCreateInstallTarget()
+
+test_env = env.Clone()
+test_env.MBAddAlwaysRunTest(sys.executable + ' test/run_all_tests.py')
