@@ -52,39 +52,39 @@ class Test_Readline(unittest.TestCase):
 
     def test_readline(self):
         """Test readline method"""
-        self.s.write(serial.to_bytes("1\n2\n3\n"))
-        self.assertEqual(self.s.readline(), serial.to_bytes("1\n"))
-        self.assertEqual(self.s.readline(), serial.to_bytes("2\n"))
-        self.assertEqual(self.s.readline(), serial.to_bytes("3\n"))
+        self.s.write(serial.to_bytes(b"1\n2\n3\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes(b"1\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes(b"2\n"))
+        self.assertEqual(self.s.readline(), serial.to_bytes(b"3\n"))
         # this time we will get a timeout
         self.assertEqual(self.s.readline(), serial.to_bytes(""))
 
     def test_readlines(self):
         """Test readlines method"""
-        self.s.write(serial.to_bytes("1\n2\n3\n"))
+        self.s.write(serial.to_bytes(b"1\n2\n3\n"))
         self.assertEqual(
                 self.s.readlines(),
-                [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
+                [serial.to_bytes(b"1\n"), serial.to_bytes(b"2\n"), serial.to_bytes(b"3\n")]
                 )
 
     def test_xreadlines(self):
         """Test xreadlines method (skipped for io based systems)"""
         if hasattr(self.s, 'xreadlines'):
-            self.s.write(serial.to_bytes("1\n2\n3\n"))
+            self.s.write(serial.to_bytes(b"1\n2\n3\n"))
             self.assertEqual(
                     list(self.s),
-                    [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
+                    [serial.to_bytes(b"1\n"), serial.to_bytes(b"2\n"), serial.to_bytes(b"3\n")]
                     )
 
     def test_for_in(self):
         """Test for line in s"""
-        self.s.write(serial.to_bytes("1\n2\n3\n"))
+        self.s.write(serial.to_bytes(b"1\n2\n3\n"))
         lines = []
         for line in self.s:
             lines.append(line)
         self.assertEqual(
                 lines,
-                [serial.to_bytes("1\n"), serial.to_bytes("2\n"), serial.to_bytes("3\n")]
+                [serial.to_bytes(b"1\n"), serial.to_bytes(b"2\n"), serial.to_bytes(b"3\n")]
                 )
 
     def test_alternate_eol(self):
