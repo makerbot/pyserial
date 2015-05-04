@@ -1,58 +1,10 @@
-# setup.py for pySerial
-#
-# Windows installer:
-#   "python setup.py bdist_wininst"
-#
-# Direct install (all systems):
-#   "python setup.py install"
-#
-# For Python 3.x use the corresponding Python executable,
-# e.g. "python3 setup.py ..."
-from ez_setup import use_setuptools
-use_setuptools()
-
-import sys
-
-from distutils.core import setup
-
-if sys.version_info >= (3, 0):
-    try:
-        from distutils.command.build_py import build_py_2to3 as build_py
-        from distutils.command.build_scripts import build_scripts_2to3 as build_scripts
-    except ImportError:
-        raise ImportError("build_py_2to3 not found in distutils - it is required for Python 3.x")
-    suffix = "-py3k"
-else:
-    from distutils.command.build_py import build_py
-    from distutils.command.build_scripts import build_scripts
-    suffix = ""
-
-
-if sys.version < '2.3':
-    # distutils that old can't cope with the "classifiers" or "download_url"
-    # keywords and True/False constants and basestring are missing
-    raise ValueError("Sorry Python versions older than 2.3 are no longer"
-                     "supported - check http://pyserial.sf.net for older "
-                     "releases or upgrade your Python installation.")
-
-# importing version does not work with Python 3 as files have not yet been
-# converted.
-#~ import serial
-#~ version = serial.VERSION
-
-if sys.version >= '2.3' and sys.version < '3.0':
-  import serial
-  version = serial.__version__
-
-elif sys.version >= 3.0:
-  import re, os
-  version = re.search(
-        "__version__.*'(.+)'",
-        open(os.path.join('serial', '__init__.py')).read()).group(1)
-
+from setuptools import setup
+from serial import __version__ as version
+from distutils.command.build_py import build_py
+from distutils.command.build_scripts import build_scripts
 
 setup(
-    name = "pyserial" + suffix,
+    name = "pyserial",
     description = "Python Serial Port Extension Extended by Makerbot Industries",
     version = version,
     author = ["Chris Liechti", "Matt Mets", "David Sayles"],
