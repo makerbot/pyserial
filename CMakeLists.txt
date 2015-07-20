@@ -1,9 +1,9 @@
 
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1)
 
 project(pyserial NONE)
 
-find_package(MBCMakeTools REQUIRED)
+find_package(MBCMakeTools REQUIRED NO_POLICY_SCOPE)
 
 find_package(PythonInterp)
 
