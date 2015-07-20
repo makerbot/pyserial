@@ -59,12 +59,12 @@ add_custom_target(pyserial ALL DEPENDS ${egg})
 
 install(
     FILES ${egg}
-    DESTINATION ${EGG_OUTPUT_PATH})
+    DESTINATION ${EGG_INSTALL_DIR})
 
-install_egg_config(
+generate_and_install_config(
     NAME Pyserial
-    EGG_NAME pyserial
-    EGG_LOCATION ${EGG_OUTPUT_PATH}/${egg_name})
+    ADDITIONAL_PATHS
+        pyserial ${EGG_INSTALL_DIR}/${egg_name})
 
 enable_testing()
 
