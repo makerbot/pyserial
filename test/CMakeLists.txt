@@ -1,6 +1,4 @@
 
-enable_testing()
-
 set(tests
 
     test_readline
@@ -15,8 +13,19 @@ set(tests
     test_high_load
     test_advanced)
 
+construct_env_path(
+    VALUES ${egg}
+    PREPEND_ENV_VAL PYTHONPATH
+    PREPEND_ASSIGNMENT
+    OUTPUT_VARIABLE pythonpath)
+
 foreach(t ${tests})
     add_test(
         NAME ${t}
-        COMMAND ${PYTHON_EXECUTABLE} run_all_tests.py /dev/ttyACM0 ${t} -v)
+        COMMAND
+            ${CMAKE_COMMAND} -E env "${pythonpath}"
+            ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/test/run_all_tests.py
+            /dev/ttyACM0
+            ${PROJECT_SOURCE_DIR}/test/${t}
+            -v)
 endforeach()
