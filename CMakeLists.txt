@@ -66,5 +66,6 @@ generate_and_install_config(
     ADDITIONAL_PATHS
         pyserial ${EGG_INSTALL_DIR}/${egg_name})
 
+enable_testing()
 add_subdirectory(test)
 add_subdirectory(documentation)
