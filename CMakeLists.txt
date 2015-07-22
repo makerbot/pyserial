@@ -69,7 +69,6 @@ add_custom_command(
     OUTPUT
         ${egg}
     COMMAND
-        ${CMAKE_COMMAND} -E env PYTHONPATH=${PROJECT_SOURCE_DIR}
         ${PYTHON_EXECUTABLE} ${setup_py}
         bdist_egg
         --bdist-dir ${sandbox}/bdist-tmp
