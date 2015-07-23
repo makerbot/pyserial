@@ -26,7 +26,8 @@ foreach(t ${tests})
         COMMAND
             ${CMAKE_COMMAND} -E env "${pythonpath}"
             ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/test/run_all_tests.py
-            /dev/ttyACM0
-            ${PROJECT_SOURCE_DIR}/test/${t}
-            -v)
+            --port /dev/ttyACM0
+            --tests ${PROJECT_SOURCE_DIR}/test/${t}
+            -v
+            --no-path-mangling)
 endforeach()
