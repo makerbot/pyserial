@@ -30,7 +30,8 @@ build_egg(
         serial/sermsdos.py
         serial/serialutil.py
         serial/serialcli.py
-    EGG_OUT egg)
+    EGG_NAME egg_name
+    EGG egg)
 
 install(
     FILES ${egg}

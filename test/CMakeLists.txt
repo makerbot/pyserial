@@ -13,6 +13,7 @@ set(tests
     test_high_load
     test_advanced)
 
+# We test the built egg, not the source
 construct_env_path(
     VALUES ${egg}
     PREPEND_ENV_VAL PYTHONPATH
