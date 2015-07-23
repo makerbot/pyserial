@@ -6,11 +6,12 @@
 # (C) 2001-2010 Chris Liechti <cliechti@gmx.net>
 # this is distributed under a free software license, see license.txt
 
-#this variable is kept for backwards compatability
-VERSION = 'mb2.1'
+# for new naming standard compatiblity, we use _
+# MakerBot sub-version is after the'mb' tab
+__version__ = '2.7_mb2.1'
 
-__version__ = 'mb2.1' #for new naming standard compatiblity, we use _
-#MakerBot sub-version is after the'mb' tab
+# this variable is kept for backwards compatability
+VERSION = __version__
 
 import sys
 
