@@ -10,10 +10,10 @@ VERSION = "0.3"
 
 #chose an implementation, depending on os
 if os.name == 'nt':
-    from parallelwin32 import *
+    from .parallelwin32 import *
 elif os.name == 'posix':
     if sys.platform == 'linux2':
-        from parallelppdev import *     #linux, kernel 2.4
+        from .parallelppdev import *     #linux, kernel 2.4
     else:
         from parallelioctl import *     #IOCTLs
 elif os.name == 'java':

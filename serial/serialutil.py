@@ -42,7 +42,7 @@ except (NameError, AttributeError):
                 return ord(list.__getitem__(self, item))
 
         def __eq__(self, other):
-            if isinstance(other, basestring):
+            if isinstance(other, str):
                 other = bytearray(other)
             return list.__eq__(self, other)
 
@@ -130,7 +130,7 @@ class FileLike(object):
         pass
 
     # iterator for e.g. "for line in Serial(0): ..." usage
-    def next(self):
+    def __next__(self):
         line = self.readline()
         if not line: raise StopIteration
         return line
@@ -290,7 +290,7 @@ class SerialBase(object):
         was_open = self._isOpen
         if was_open: self.close()
         if port is not None:
-            if isinstance(port, basestring):
+            if isinstance(port, str):
                 self.portstr = port
             else:
                 self.portstr = self.makeDeviceName(port)
@@ -508,7 +508,7 @@ class SerialBase(object):
         n = len(data)
         try:
             b[:n] = data
-        except TypeError, err:
+        except TypeError as err:
             import array
             if not isinstance(b, array.array):
                 raise err

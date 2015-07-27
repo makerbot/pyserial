@@ -38,7 +38,7 @@ class IronSerial(SerialBase):
             raise SerialException("Port is already open.")
         try:
             self._port_handle = System.IO.Ports.SerialPort(self.portstr)
-        except Exception, msg:
+        except Exception as msg:
             self._port_handle = None
             raise SerialException("could not open port %s: %s" % (self.portstr, msg))
 
@@ -75,7 +75,7 @@ class IronSerial(SerialBase):
         # Setup the connection info.
         try:
             self._port_handle.BaudRate = self._baudrate
-        except IOError, e:
+        except IOError as e:
             # catch errors from illegal baudrate settings
             raise ValueError(str(e))
 
@@ -139,7 +139,7 @@ class IronSerial(SerialBase):
     def makeDeviceName(self, port):
         try:
             return device(port)
-        except TypeError, e:
+        except TypeError as e:
             raise SerialException(str(e))
 
     #  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
@@ -160,7 +160,7 @@ class IronSerial(SerialBase):
         while size:
             try:
                 data.append(self._port_handle.ReadByte())
-            except System.TimeoutException, e:
+            except System.TimeoutException as e:
                 break
             else:
                 size -= 1
@@ -175,7 +175,7 @@ class IronSerial(SerialBase):
             # must call overloaded method with byte array argument
             # as this is the only one not applying encodings
             self._port_handle.Write(as_byte_array(data), 0, len(data))
-        except System.TimeoutException, e:
+        except System.TimeoutException as e:
             raise writeTimeoutError
         return len(data)
 
