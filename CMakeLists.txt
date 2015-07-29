@@ -8,7 +8,6 @@ find_package(MBCMakeTools REQUIRED NO_POLICY_SCOPE)
 build_wheel(
     pyserial
     SETUP_PY ${PROJECT_SOURCE_DIR}/setup.py
-    PY_VERSION_SUFFIX py3
     SOURCES
         serial/serialposix.py
         serial/urlhandler/protocol_socket.py
@@ -34,14 +33,20 @@ build_wheel(
     WHEEL_NAME wheel_name
     WHEEL wheel)
 
+# Also create a .pth file so that we can import the egg without
+# manually adding it to the path (see the docs for site.py).
+# TODO(chris):  Resolve python3 issues and use mustache here
+set(pyserial_pth "${PROJECT_BINARY_DIR}/pyserial.pth")
+configure_file("${PROJECT_SOURCE_DIR}/pyserial.pth.in" "${pyserial_pth}")
+
 install(
-    FILES ${wheel}
-    DESTINATION ${EGG_INSTALL_DIR})
+    FILES ${wheel} ${pyserial_pth}
+    DESTINATION ${PY34_MODULE_DIR})
 
 generate_and_install_config(
     NAME Pyserial
     ADDITIONAL_PATHS
-        pyserial ${EGG_INSTALL_DIR}/${wheel_name})
+        pyserial ${PY34_MODULE_DIR}/${wheel_name})
 
 enable_testing()
 add_subdirectory(test)
