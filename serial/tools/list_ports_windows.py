@@ -1,7 +1,6 @@
 import ctypes
 import winreg as winreg
 import itertools
-import sets
 import re
 import logging
 
