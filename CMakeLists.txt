@@ -48,15 +48,8 @@ build_wheel(
     WHEEL_NAME wheel_name
     WHEEL wheel)
 
-# Also create a .pth file so that we can import the egg without
-# manually adding it to the path (see the docs for site.py).
-# TODO(chris):  Resolve python3 issues and use mustache here
-set(pyserial_pth "${PROJECT_BINARY_DIR}/pyserial.pth")
-configure_file("${PROJECT_SOURCE_DIR}/pyserial.pth.in" "${pyserial_pth}")
-
-install(
-    FILES ${wheel} ${pyserial_pth}
-    DESTINATION ${PY34_MODULE_DIR})
+pip_install(${wheel} pip_target)
+add_dependencies(pip_target pyserial34)
 
 # For now we only export the path to the egg in our config,
 # since I don't know if we actually need to export the wheel
