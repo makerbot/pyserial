@@ -1,8 +1,12 @@
 import ctypes
-import winreg as winreg
 import itertools
 import re
 import logging
+
+try:
+    import winreg
+except ImportError:
+    import _winreg as winreg
 
 def ValidHandle(value, func, arguments):
     if value == 0:
