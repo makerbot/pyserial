@@ -69,7 +69,7 @@ def get_string_property(device_t, property):
         key,
         kCFAllocatorDefault,
         0
-    );
+    )
 
     output = None
 
@@ -174,12 +174,15 @@ def comports():
         info = []
 
         # First, add the callout device file.
-        info.append(convertString(get_string_property(service, "IOCalloutDevice")))
+        device = get_string_property(service, "IOCalloutDevice")
+        if device:
+            info.append(convertString(device))
 
         # If the serial port is implemented by a
         usb_device = GetParentDeviceByType(service, "IOUSBDevice")
-        if usb_device != None:
-            info.append(convertString(get_string_property(usb_device, "USB Product Name")))
+
+        if usb_device is not None:
+            info.append(convertString(get_string_property(usb_device, "USB Product Name") or b'n/a'))
 
             info.append(
                 "USB VID:PID=%x:%x SNR=%s"%(
