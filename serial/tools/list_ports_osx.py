@@ -160,7 +160,9 @@ def GetIOServicesByType(service_type):
     return services
 
 def convertString(string):
-    if sys.version_info[0] < 3:
+    if string is None:
+        return
+    elif sys.version_info[0] < 3:
         return string
     else:
         return str(string, encoding='ascii')
