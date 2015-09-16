@@ -57,6 +57,6 @@ if __name__=='__main__':
     #write out some test data lines
     s.write('\n'.join("hello how are you".split()))
     #and read them back
-    print s.readlines()
+    print(s.readlines())
     #this one should print an empty list
-    print s.readlines(timeout=0.4)
+    print(s.readlines(timeout=0.4))

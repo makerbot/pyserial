@@ -26,4 +26,4 @@ arguments = arg_parser.parse_args(args)
 vid = int('0x' + arguments.vid, 16)
 pid = int('0x' + arguments.pid, 16) if None != arguments.pid else None
 
-print list(lp.list_ports_by_vid_pid(vid, pid))
+print(list(lp.list_ports_by_vid_pid(vid, pid)))

@@ -15,7 +15,7 @@ try:
     enumerate
 except NameError:
     def enumerate(sequence):
-        return zip(range(len(sequence)), sequence)
+        return list(zip(list(range(len(sequence))), sequence))
 
 class SerialConfigDialog(wx.Dialog):
     """Serial Port confiuration dialog, to be used with pyserial 2.0+
@@ -31,7 +31,7 @@ class SerialConfigDialog(wx.Dialog):
         self.serial = kwds['serial']
         del kwds['serial']
         self.show = SHOW_ALL
-        if kwds.has_key('show'):
+        if 'show' in kwds:
             self.show = kwds['show']
             del kwds['show']
         # begin wxGlade: SerialConfigDialog.__init__
@@ -232,7 +232,7 @@ class MyApp(wx.App):
         wx.InitAllImageHandlers()
         
         ser = serial.Serial()
-        print ser
+        print(ser)
         #loop until cancel is pressed, old values are used as start for the next run
         #show the different views, one after the other
         #value are kept.
@@ -240,7 +240,7 @@ class MyApp(wx.App):
             dialog_serial_cfg = SerialConfigDialog(None, -1, "", serial=ser, show=flags)
             self.SetTopWindow(dialog_serial_cfg)
             result = dialog_serial_cfg.ShowModal()
-            print ser
+            print(ser)
             if result != wx.ID_OK:
                 break
         #the user can play around with the values, CANCEL aborts the loop
@@ -248,7 +248,7 @@ class MyApp(wx.App):
             dialog_serial_cfg = SerialConfigDialog(None, -1, "", serial=ser)
             self.SetTopWindow(dialog_serial_cfg)
             result = dialog_serial_cfg.ShowModal()
-            print ser
+            print(ser)
             if result != wx.ID_OK:
                 break
         return 0

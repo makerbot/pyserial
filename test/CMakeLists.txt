@@ -1,4 +1,7 @@
 
+# TODO(chris): Fix these tests to use PYTHONHOME, but still run
+#              against the local egg.
+
 set(tests
 
     test_readline
@@ -15,7 +18,7 @@ set(tests
 
 # We test the built egg, not the source
 construct_env_path(
-    VALUES ${egg}
+    VALUES ${wheel}
     PREPEND_ENV_VAL PYTHONPATH
     PREPEND_ASSIGNMENT
     OUTPUT_VARIABLE pythonpath)

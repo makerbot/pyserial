@@ -30,11 +30,9 @@ class BitaccessMeta(type):
             setattr(klass, name, property(getter, setter, "Access to %s" % name))
         return klass
 
-class VirtualParallelPort:
+class VirtualParallelPort(metaclass=BitaccessMeta):
     """provides a virtual parallel port implementation, useful
     for tests and simulations without real hardware"""
-
-    __metaclass__ = BitaccessMeta
 
     def __init__(self, port=None):
         self._data = 0
@@ -65,13 +63,13 @@ if __name__ == '__main__':
             """bit by bit D0..D7"""
             p = self.p
             p.D0 = p.D2  = p.D4 = p.D6 = 1
-            self.failUnlessEqual(p._data, 0x55)
-            self.failUnlessEqual(
+            self.assertEqual(p._data, 0x55)
+            self.assertEqual(
                 [p.D7, p.D6, p.D5, p.D4, p.D3, p.D2, p.D1, p.D0],
                 [0, 1, 0, 1, 0, 1, 0, 1]
             )
             p._data <<= 1
-            self.failUnlessEqual(
+            self.assertEqual(
                 [p.D7, p.D6, p.D5, p.D4, p.D3, p.D2, p.D1, p.D0],
                 [1, 0, 1, 0, 1, 0, 1, 0]
             )
@@ -80,43 +78,43 @@ if __name__ == '__main__':
             """nibbles D0..D7"""
             p = self.p
             p.D0_D3 = 14
-            self.failUnlessEqual(p._data, 0x0e)
+            self.assertEqual(p._data, 0x0e)
             p.D0_D3 = 0
             p.D4_D7 = 13
-            self.failUnlessEqual(p._data, 0xd0)
+            self.assertEqual(p._data, 0xd0)
             p.D0_D3 = p.D4_D7 = 0xa
-            self.failUnlessEqual(p._data, 0xaa)
+            self.assertEqual(p._data, 0xaa)
             # test bit patterns
             for x in range(256):
                 # test getting
                 p._data = x
-                self.failUnlessEqual((p.D4_D7, p.D0_D3), (((x>>4) & 0xf), (x & 0xf)))
+                self.assertEqual((p.D4_D7, p.D0_D3), (((x>>4) & 0xf), (x & 0xf)))
                 # test setting
                 p._data = 0
                 (p.D4_D7, p.D0_D3) = (((x>>4) & 0xf), (x & 0xf))
-                self.failUnlessEqual(p._data, x)
+                self.assertEqual(p._data, x)
 
         def testStatusbits(self):
             """bit by bit status lines"""
             # read the property:
             self.p._dummy = 0
-            self.failUnlessEqual(self.p.paperOut, 0)
+            self.assertEqual(self.p.paperOut, 0)
 
             self.p._dummy = 1
-            self.failUnlessEqual(self.p.paperOut, 1)
+            self.assertEqual(self.p.paperOut, 1)
 
             # read only, must not be writable:
-            self.failUnlessRaises(AttributeError, setattr, self.p, 'paperOut', 1)
+            self.assertRaises(AttributeError, setattr, self.p, 'paperOut', 1)
 
         def testControlbits(self):
             """bit by bit control lines"""
             self.p.dataStrobe = 0
-            self.failUnlessEqual(self.p._last, ('setDataStrobe', 0))
+            self.assertEqual(self.p._last, ('setDataStrobe', 0))
             self.p.dataStrobe = 1
-            self.failUnlessEqual(self.p._last, ('setDataStrobe', 1))
+            self.assertEqual(self.p._last, ('setDataStrobe', 1))
 
             # write only, must not be writable:
-            self.failUnlessRaises(AttributeError, getattr, self.p, 'dataStrobe')
+            self.assertRaises(AttributeError, getattr, self.p, 'dataStrobe')
 
     sys.argv.append('-v')
     # When this module is executed from the command-line, it runs all its tests
