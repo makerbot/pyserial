@@ -7,7 +7,8 @@ else:
     dependencies = [
         artifactory_utils.ArtifactSelector(
             project="Toolchain-Release",
-            revision="develop",
+            revision="master",
+            version="3.9.*",
             debug=False,
             stable_required=True),
         artifactory_utils.ArtifactSelector(
@@ -17,7 +18,8 @@ else:
             stable_required=True),
         artifactory_utils.ArtifactSelector(
             project="EmbeddedPython",
-            revision="develop",
+            revision="master",
+            version="0.1.*",
             debug=False,
             stable_required=True)
     ]
