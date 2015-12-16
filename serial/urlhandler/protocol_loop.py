@@ -66,7 +66,7 @@ class LoopbackSerial(SerialBase):
         """Set communication parameters on opened port. for the loop://
         protocol all settings are ignored!"""
         # not that's it of any real use, but it helps in the unit tests
-        if not isinstance(self._baudrate, (int, long)) or not 0 < self._baudrate < 2**32:
+        if not isinstance(self._baudrate, int) or not 0 < self._baudrate < 2**32:
             raise ValueError("invalid baudrate: %r" % (self._baudrate))
         if self.logger:
             self.logger.info('_reconfigurePort()')
@@ -100,7 +100,7 @@ class LoopbackSerial(SerialBase):
                     self.logger.debug('enabled logging')
                 else:
                     raise ValueError('unknown option: %r' % (option,))
-        except ValueError, e:
+        except ValueError as e:
             raise SerialException('expected a string in the form "[loop://][option[/option...]]": %s' % e)
 
     #  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -

@@ -64,7 +64,7 @@ class Redirector:
                         self.socket.sendall(data)       # send it over TCP
                     finally:
                         self._write_lock.release()
-            except socket.error, msg:
+            except socket.error as msg:
                 self.log.error('%s' % (msg,))
                 # probably got disconnected
                 break
@@ -87,7 +87,7 @@ class Redirector:
                 if not data:
                     break
                 self.serial.write(serial.to_bytes(self.rfc2217.filter(data)))
-            except socket.error, msg:
+            except socket.error as msg:
                 self.log.error('%s' % (msg,))
                 # probably got disconnected
                 break
@@ -157,7 +157,7 @@ it waits for the next connect.
 
     try:
         ser.open()
-    except serial.SerialException, e:
+    except serial.SerialException as e:
         logging.error("Could not open serial port %s: %s" % (ser.portstr, e))
         sys.exit(1)
 
@@ -198,7 +198,7 @@ it waits for the next connect.
             ser.applySettingsDict(settings)
         except KeyboardInterrupt:
             break
-        except socket.error, msg:
+        except socket.error as msg:
             logging.error('%s' % (msg,))
 
     logging.info('--- exit ---')

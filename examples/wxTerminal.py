@@ -210,7 +210,7 @@ class TerminalFrame(wx.Frame):
         if filename is not None:
             f = file(filename, 'w')
             text = self.text_ctrl_output.GetValue()
-            if type(text) == unicode:
+            if type(text) == str:
                 text = text.encode("latin1")    #hm, is that a good asumption?
             f.write(text)
             f.close()
@@ -237,7 +237,7 @@ class TerminalFrame(wx.Frame):
             if result == wx.ID_OK or event is not None:
                 try:
                     self.serial.open()
-                except serial.SerialException, e:
+                except serial.SerialException as e:
                     dlg = wx.MessageDialog(None, str(e), "Serial Port Error", wx.OK | wx.ICON_ERROR)
                     dlg.ShowModal()
                     dlg.Destroy()
@@ -286,7 +286,7 @@ class TerminalFrame(wx.Frame):
                     self.text_ctrl_output.WriteText(char)
                 self.serial.write(char)         #send the charcater
         else:
-            print "Extra Key:", code
+            print("Extra Key:", code)
 
     def OnSerialRead(self, event):
         """Handle input from the serial port."""

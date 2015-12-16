@@ -3,10 +3,10 @@
 try:
     from setuptools import setup
 except ImportError:
-    print "standart distutils"
+    print("standart distutils")
     from distutils.core import setup
 else:
-    print "setuptools"
+    print("setuptools")
 import sys
 
 #windows installer:
@@ -21,10 +21,10 @@ if sys.version < '2.2.3':
 
 import os
 if os.name == 'nt':
-    print "# set dependedcies for windows version"
+    print("# set dependedcies for windows version")
     data_files = {'parallel': ['simpleio.dll']}
 else:
-    print "# no dependedcies"
+    print("# no dependedcies")
     data_files = {}
 
 setup(

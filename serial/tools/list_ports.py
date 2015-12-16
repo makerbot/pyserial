@@ -84,22 +84,22 @@ def main():
     if args:
         if len(args) > 1:
             parser.error('more than one regexp not supported')
-        print "Filtered list with regexp: %r" % (args[0],)
+        print("Filtered list with regexp: %r" % (args[0],))
         iterator = sorted(grep(args[0]))
     else:
         iterator = sorted(comports())
     # list them
     for port, desc, hwid in iterator:
-        print "%-20s" % (port,)
+        print("%-20s" % (port,))
         if options.verbose > 1:
-            print "    desc: %s" % (desc,)
-            print "    hwid: %s" % (hwid,)
+            print("    desc: %s" % (desc,))
+            print("    hwid: %s" % (hwid,))
         hits += 1
     if options.verbose:
         if hits:
-            print "%d ports found" % (hits,)
+            print("%d ports found" % (hits,))
         else:
-            print "no ports found"
+            print("no ports found")
 
 # test
 if __name__ == '__main__':

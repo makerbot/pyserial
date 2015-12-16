@@ -19,7 +19,7 @@ class Serial(serial.Serial):
 
     def setPort(self, value):
         """translate port name before storing it"""
-        if isinstance(value, basestring) and value.startswith('hwgrep://'):
+        if isinstance(value, str) and value.startswith('hwgrep://'):
             serial.Serial.setPort(self, self.fromURL(value))
         else:
             serial.Serial.setPort(self, value)
@@ -41,5 +41,5 @@ if __name__ == '__main__':
     #~ s = Serial('hwgrep://ttyS0')
     s = Serial(None)
     s.port = 'hwgrep://ttyS0'
-    print s
+    print(s)
 

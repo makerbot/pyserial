@@ -1,9 +1,12 @@
 import ctypes
-import _winreg as winreg
 import itertools
-import sets
 import re
 import logging
+
+try:
+    import winreg
+except ImportError:
+    import _winreg as winreg
 
 def ValidHandle(value, func, arguments):
     if value == 0:
@@ -123,7 +126,7 @@ RegQueryValueEx.argtypes = [HKEY, LPCSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD]
 RegQueryValueEx.restype = LONG
 
 
-GUID_CLASS_COMPORT = GUID(0x86e0d1e0L, 0x8089, 0x11d0,
+GUID_CLASS_COMPORT = GUID(0x86e0d1e0, 0x8089, 0x11d0,
     (BYTE*8)(0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73))
 
 DIGCF_PRESENT = 2
@@ -515,4 +518,4 @@ def list_ports_by_vid_pid(vid=None, pid=None):
 if __name__ == '__main__':
     ports = list_ports_by_vid_pid(int('0x23C1', 16),int('0xD314', 16))
     for port in ports:
-        print port
+        print(port)

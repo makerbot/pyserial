@@ -60,7 +60,7 @@ class Redirector:
                         self.socket.sendall(data)           # send it over TCP
                     finally:
                         self._write_lock.release()
-            except socket.error, msg:
+            except socket.error as msg:
                 sys.stderr.write('ERROR: %s\n' % msg)
                 # probably got disconnected
                 break
@@ -90,7 +90,7 @@ class Redirector:
                 if self.spy:
                     sys.stdout.write(codecs.escape_encode(data)[0])
                     sys.stdout.flush()
-            except socket.error, msg:
+            except socket.error as msg:
                 sys.stderr.write('ERROR: %s\n' % msg)
                 # probably got disconnected
                 break
@@ -287,7 +287,7 @@ it waits for the next connect.
 
     try:
         ser.open()
-    except serial.SerialException, e:
+    except serial.SerialException as e:
         sys.stderr.write("Could not open serial port %s: %s\n" % (ser.portstr, e))
         sys.exit(1)
 
@@ -319,7 +319,7 @@ it waits for the next connect.
             connection.close()
         except KeyboardInterrupt:
             break
-        except socket.error, msg:
+        except socket.error as msg:
             sys.stderr.write('ERROR: %s\n' % msg)
 
     sys.stderr.write('\n--- exit ---\n')

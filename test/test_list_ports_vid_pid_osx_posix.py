@@ -18,16 +18,16 @@ class TestListPortsOsx(unittest.TestCase):
         ['/dev/cu.Bluetooth-Modem', '', '']
         ]
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports) 
-      self.assertEquals(len(list(gen)), len(input_ports))
+      self.assertEqual(len(list(gen)), len(input_ports))
  
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports,vid=0x23C1) 
-      self.assertEquals(len(list(gen)), 1)
+      self.assertEqual(len(list(gen)), 1)
 
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports,pid=0x1111) 
-      self.assertEquals(len(list(gen)), 0)
+      self.assertEqual(len(list(gen)), 0)
 
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports,pid=0xd314) 
-      self.assertEquals(len(list(gen)), 1)
+      self.assertEqual(len(list(gen)), 1)
       
       gen = lp_vidpid.filter_ports_by_vid_pid(input_ports,pid=0xD315, vid=0x23C1) 
 
@@ -35,13 +35,13 @@ class TestListPortsOsx(unittest.TestCase):
 
     def test_blank_string(self):
         dummyport = ('a','b')
-        self.assertEquals(
+        self.assertEqual(
 		        lp_vidpid.portdict_from_port(dummyport)
 		        ,{'blob':dummyport, 'port':dummyport[0]} )
 
     def test_not_usb_device(self):
         dummyport=('','abcdefg')
-        self.assertEquals(lp_vidpid.portdict_from_port(dummyport)
+        self.assertEqual(lp_vidpid.portdict_from_port(dummyport)
 			      ,{'blob':dummyport, 'port':dummyport[0]})
 
     def test_good_params_upper_case(self):
@@ -54,7 +54,7 @@ class TestListPortsOsx(unittest.TestCase):
           ,'port' : dummyport[0]
           }
 
-        self.assertEquals(
+        self.assertEqual(
             lp_vidpid.portdict_from_port(dummyport),
             expected_info
           )

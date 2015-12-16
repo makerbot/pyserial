@@ -10,6 +10,7 @@
 import ctypes
 from ctypes import util
 import re
+import sys
 
 iokit = ctypes.cdll.LoadLibrary(ctypes.util.find_library('IOKit'))
 cf = ctypes.cdll.LoadLibrary(ctypes.util.find_library('CoreFoundation'))
@@ -119,7 +120,7 @@ def GetParentDeviceByType(device, parent_type):
         @return Pointer to the parent type, or None if it was not found.
     """
     # First, try to walk up the IOService tree to find a parent of this device that is a IOUSBDevice.
-    while IORegistryEntryGetName(device) != parent_type:
+    while convertString(IORegistryEntryGetName(device)) != parent_type:
 
         parent = ctypes.c_void_p()
         response = iokit.IORegistryEntryGetParentEntry(
@@ -143,7 +144,7 @@ def GetIOServicesByType(service_type):
 
     response = iokit.IOServiceGetMatchingServices(
         kIOMasterPortDefault,
-        iokit.IOServiceMatching(service_type),
+        iokit.IOServiceMatching(service_type.encode('ascii')),
         ctypes.byref(serial_port_iterator)
     )
 
@@ -158,6 +159,14 @@ def GetIOServicesByType(service_type):
 
     return services
 
+def convertString(string):
+    if string is None:
+        return
+    elif sys.version_info[0] < 3:
+        return string
+    else:
+        return str(string, encoding='ascii')
+
 def comports():
     # Scan for all iokit serial ports
     services = GetIOServicesByType('IOSerialBSDClient')
@@ -167,18 +176,18 @@ def comports():
         info = []
 
         # First, add the callout device file.
-        info.append(get_string_property(service, "IOCalloutDevice"))
+        info.append(convertString(get_string_property(service, "IOCalloutDevice")))
 
         # If the serial port is implemented by a
         usb_device = GetParentDeviceByType(service, "IOUSBDevice")
         if usb_device != None:
-            info.append(get_string_property(usb_device, "USB Product Name"))
+            info.append(convertString(get_string_property(usb_device, "USB Product Name")))
 
             info.append(
                 "USB VID:PID=%x:%x SNR=%s"%(
                 get_int_property(usb_device, "idVendor"),
                 get_int_property(usb_device, "idProduct"),
-                get_string_property(usb_device, "USB Serial Number"))
+                convertString(get_string_property(usb_device, "USB Serial Number")))
             )
         else:
            info.append('')
@@ -191,4 +200,4 @@ def comports():
 # test
 if __name__ == '__main__':
     for port, desc, hwid in sorted(comports()):
-        print "%s: %s [%s]" % (port, desc, hwid)
+        print("%s: %s [%s]" % (port, desc, hwid))
