@@ -135,6 +135,9 @@ class FileLike(object):
         if not line: raise StopIteration
         return line
 
+    # Python 2 compatibility
+    next = __next__
+
     def __iter__(self):
         return self
 
