@@ -64,8 +64,12 @@ import time
 import struct
 import socket
 import threading
-import queue
 import logging
+
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 # port string is expected to be something like this:
 # rfc2217://host:port

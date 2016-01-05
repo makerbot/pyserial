@@ -298,7 +298,7 @@ def acquireLock(port, path, secondTry = False):
     else:
         try:
             fhLock = os.open(path, os.O_EXCL|os.O_CREAT|os.O_RDWR)
-            pid = bytes(str(os.getpid()) + "\n", encoding='UTF-8')
+            pid = (str(os.getpid()) + "\n").encode('UTF-8')
             os.write(fhLock,pid)
             os.close(fhLock)
             return True
